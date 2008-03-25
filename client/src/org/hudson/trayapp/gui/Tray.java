@@ -1,5 +1,6 @@
 package org.hudson.trayapp.gui;
 import java.awt.AWTException;
+import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -11,8 +12,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.hudson.trayapp.HudsonTrayApp;
 import org.hudson.trayapp.model.Job;
@@ -70,40 +76,9 @@ public class Tray {
 		        }
 		    };
 
-		    ActionListener exitListener = new ActionListener() {
-		        public void actionPerformed(ActionEvent e) {
-		        	HudsonTrayApp.getHudsonTrayAppInstance().write();
-		            System.out.println("Exiting...");
-		            System.exit(0);
-		        }
-		    };
-
-		    ActionListener openFrameListener = new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
-		    		showMainWindow();
-		    	}
-		    };
-		    
-		    ActionListener updatedListener = new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
-		    		HudsonTrayApp.getHudsonTrayAppInstance().update();
-		    	}
-		    };
-
-		    PopupMenu popup = new PopupMenu();
-		    MenuItem openFrameItem = new MenuItem("Open Application");
-		    openFrameItem.addActionListener(openFrameListener);
-		    popup.add(openFrameItem);
-
-		    MenuItem updateItem = new MenuItem("Fetch Update");
-		    updateItem.addActionListener(updatedListener);
-		    popup.add(updateItem);
-
-		    MenuItem defaultItem = new MenuItem("Exit");
-		    defaultItem.addActionListener(exitListener);
-		    popup.add(defaultItem);
-
-		    trayIcon = new TrayIcon(image, "Hudson Tray Application", popup);
+		    trayIcon = new TrayIcon(image);
+		    setToolTip("");
+		    rebuildPopupMenu(new Vector<Job>(0));
 
 		    ActionListener actionListener = new ActionListener() {
 		        public void actionPerformed(ActionEvent e) {
@@ -140,5 +115,72 @@ public class Tray {
 	
 	public void showMessage(String caption, String message, MessageType type) {
 		trayIcon.displayMessage(caption, message, type);
+	}
+	
+	public void setToolTip(String tooltip) {
+		trayIcon.setToolTip("Hudson Tray Application\n" + tooltip);
+	}
+	
+	public void rebuildPopupMenu(List<Job> jobs) {
+		PopupMenu popup = new PopupMenu();
+		if (jobs.size() > 0) {
+			for (int i = 0; i < jobs.size(); i++) {
+				Job job = jobs.get(i);
+				ActionListener jobPopupListener = new ActionListener() {
+					private Job jobLink = null;
+					public ActionListener prepare(final Job job) {
+						jobLink = job;
+						return this;
+					}
+					public void actionPerformed(ActionEvent e) {
+						try{
+							Desktop.getDesktop().browse(new URI(jobLink.getRFC2396CompliantURL()));
+						} catch (URISyntaxException er) {
+							showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + er.getLocalizedMessage(), TrayIcon.MessageType.ERROR);
+						} catch (IOException er) {
+							showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + er.getLocalizedMessage(), TrayIcon.MessageType.ERROR);
+						}
+					}
+				}.prepare(job);
+				MenuItem jobMenuItem = new MenuItem(job.getName());
+				jobMenuItem.addActionListener(jobPopupListener);
+				popup.add(jobMenuItem);
+			}
+			popup.addSeparator();
+		}
+	    
+	    ActionListener exitListener = new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	HudsonTrayApp.getHudsonTrayAppInstance().write();
+	            System.out.println("Exiting...");
+	            System.exit(0);
+	        }
+	    };
+
+	    ActionListener openFrameListener = new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		showMainWindow();
+	    	}
+	    };
+	    
+	    ActionListener updatedListener = new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		HudsonTrayApp.getHudsonTrayAppInstance().update();
+	    	}
+	    };
+
+	    MenuItem openFrameItem = new MenuItem("Open Application");
+	    openFrameItem.addActionListener(openFrameListener);
+	    popup.add(openFrameItem);
+
+	    MenuItem updateItem = new MenuItem("Fetch Update");
+	    updateItem.addActionListener(updatedListener);
+	    popup.add(updateItem);
+
+	    MenuItem defaultItem = new MenuItem("Exit");
+	    defaultItem.addActionListener(exitListener);
+	    popup.add(defaultItem);
+	    
+	    trayIcon.setPopupMenu(popup);
 	}
 }
