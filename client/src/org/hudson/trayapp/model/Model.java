@@ -185,31 +185,20 @@ public class Model{
 			}
 		}
 
-		Collection<Job> jobsPrevious = getWorstJobs(true);
-		Collection<Job> jobsCurrent = getWorstJobs(false);
-		
 		// If any of the previous worst jobs aren't in the new worst jobs list, this will return true.
-		Iterator<Job> iterJobs = jobsPrevious.iterator();
-		while (iterJobs.hasNext()) {
-			if (!(jobsCurrent.contains(iterJobs.next()))) {
-				// We have at least one Job that has moved out of the worst job list, return true.
-				return true;
-			}
-		}
+		if (getJobsLeftWorstBuild().size() > 0)
+			return true;
 		// If any of the current previous jobs aren't in the previous worst jobs list, this will return true.
-		iterJobs = jobsCurrent.iterator();
-		while (iterJobs.hasNext()) {
-			if (!(jobsPrevious.contains(iterJobs.next()))) {
-				// We have at least one Job that has moved into the worst job list, return true.
-				return true;
-			}
-		}
+		if (getJobsJoinedWorstBuild().size() > 0)
+			return true;
 		/*
 		 * If after checking the above, nothing has changed, then it will inspect each job, and check
 		 * the build numbers. If any of the build numbers have changed, then this will return true.\n
 		*/
+		Collection<Job> jobsPrevious = getWorstJobs(true);
+		Collection<Job> jobsCurrent = getWorstJobs(false);
 		Map<String, Job> mapPrevious = new HashMap<String, Job>(jobsPrevious.size());
-		iterJobs = jobsPrevious.iterator();
+		Iterator<Job> iterJobs = jobsPrevious.iterator();
 		while (iterJobs.hasNext()) {
 			Job job = iterJobs.next();
 			mapPrevious.put(job.getUrl(), job);
@@ -234,6 +223,38 @@ public class Model{
 		}
 		// Otherwise, this will return false
 		return false;
+	}
+	
+	public List<Job> getJobsLeftWorstBuild() {
+		List<Job> lstReturn = new Vector<Job>();
+		Collection<Job> jobsPrevious = getWorstJobs(true);
+		Collection<Job> jobsCurrent = getWorstJobs(false);
+		
+		Iterator<Job> iterJobs = jobsPrevious.iterator();
+		while (iterJobs.hasNext()) {
+			Job job = iterJobs.next();
+			if (!(jobsCurrent.contains(job))) {
+				lstReturn.add(job);
+			}
+		}
+		return lstReturn;
+	}
+	
+	public List<Job> getJobsJoinedWorstBuild() {
+		List<Job> lstReturn = new Vector<Job>();
+		Collection<Job> jobsPrevious = getWorstJobs(true);
+		Collection<Job> jobsCurrent = getWorstJobs(false);
+		
+		// If any of the previous worst jobs aren't in the new worst jobs list, this will return true.
+		Iterator<Job> iterJobs = jobsCurrent.iterator();
+		while (iterJobs.hasNext()) {
+			Job job = iterJobs.next();
+			if (!(jobsPrevious.contains(job))) {
+				// We have at least one Job that has moved out of the worst job list, return true.
+				lstReturn.add(job);
+			}
+		}
+		return lstReturn;
 	}
 	
 	public void writeXML(Writer w) throws IOException {
