@@ -108,7 +108,7 @@ public class Model{
 	 * from the previous update, or false if you want the current worst jobs.
 	 * @return This returns a collection (never null) of jobs that are the worst jobs overall.
 	 */
-	public Collection<Job> getWorstJobs(boolean fromPrevious) {
+	public List<Job> getWorstJobs(boolean fromPrevious) {
 		Vector<Job> vecWorst = new Vector<Job>();
 		int worstCase = -1;
 		Iterator<Server> serveriter;
