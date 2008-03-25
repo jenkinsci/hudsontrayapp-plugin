@@ -42,6 +42,7 @@ public class PluginImpl extends Plugin {
         w.write("<application-desc main-class=\"org.hudson.trayapp.HudsonTrayApp\">");
         w.write("<argument>server="); w.write(req.getRootPath()); w.write("/</argument>"); 
         w.write("</application-desc>");
+        w.write("</jnlp>");
         w.close();
 	}
 }
