@@ -113,7 +113,10 @@ public class HudsonTrayApp {
 		Integer colourCurrent = Job.convertColour(model.getWorstColour(false));
 		MainFrame.getMainFrameInstance().updateResults();
 		tray.setWorstCaseColour(Job.getColour(colourCurrent));
-		
+
+		StringBuilder sb;
+		List<Job> worstJobs = model.getWorstJobs(false);
+		tray.rebuildPopupMenu(worstJobs);
 		// There is no point doing anything if we're on the first run.
 		if (model.getWorstJobs(true).isEmpty()) {
 			return;
@@ -123,6 +126,7 @@ public class HudsonTrayApp {
 		Integer buildChanged = bldChgd ? Job.BUILD_CHANGED : Job.BUILD_UNCHANGED;
 		
 		if (colourPrevious.intValue() > colourCurrent.intValue()) {
+			//List<Job> 
 			tray.showMessage("Build Worsening", "The overall build status has degraded from\n"+Job.getColour(colourPrevious) + " to " + Job.getColour(colourCurrent), TrayIcon.MessageType.ERROR);
 		} else if (colourPrevious.intValue() < colourCurrent.intValue()) {
 			tray.showMessage("Build Improving", "The overall build status has improved from\n"+Job.getColour(colourPrevious) + " to " + Job.getColour(colourCurrent), TrayIcon.MessageType.INFO);
@@ -133,14 +137,14 @@ public class HudsonTrayApp {
 				tray.showMessage("Build No Improvement", "The overall build has changed, but this has neither made an improvement or degredation.", TrayIcon.MessageType.INFO);
 			} else if (lstLeftJobs.isEmpty()) {
 				// We haven't had any jobs leave which means that some have joined our status.
-				StringBuilder sb = new StringBuilder();
+				sb = new StringBuilder();
 				for (int i = 0; i < lstJoinedJobs.size(); i++) {
 					sb.append("\n"+lstJoinedJobs.get(i).getName());
 				}
 				tray.showMessage("Jobs have Joined Worst Colour", "The overall build worst colour hasn't changed, but the following projects have worsened, and joined this colour:" + sb.toString(), TrayIcon.MessageType.ERROR);
 			} else if (lstJoinedJobs.isEmpty()) {
 				// We haven't had any jobs join which means that some have left our status.
-				StringBuilder sb = new StringBuilder();
+				sb = new StringBuilder();
 				for (int i = 0; i < lstLeftJobs.size(); i++) {
 					sb.append("\n"+lstLeftJobs.get(i).getName());
 				}
