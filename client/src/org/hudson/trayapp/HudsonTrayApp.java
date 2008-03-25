@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -126,7 +127,36 @@ public class HudsonTrayApp {
 		} else if (colourPrevious.intValue() < colourCurrent.intValue()) {
 			tray.showMessage("Build Improving", "The overall build status has improved from\n"+Job.getColour(colourPrevious) + " to " + Job.getColour(colourCurrent), TrayIcon.MessageType.INFO);
 		} else if (bldChgd && colourCurrent.intValue() < Job.BLUE.intValue()) {
-			tray.showMessage("Build No Improvement", "The overall build has changed, but this has neither made an improvement or degredation.", TrayIcon.MessageType.INFO);
+			List<Job> lstLeftJobs = model.getJobsLeftWorstBuild();
+			List<Job> lstJoinedJobs = model.getJobsJoinedWorstBuild();
+			if (lstLeftJobs.isEmpty() && lstJoinedJobs.isEmpty()) {
+				tray.showMessage("Build No Improvement", "The overall build has changed, but this has neither made an improvement or degredation.", TrayIcon.MessageType.INFO);
+			} else if (lstLeftJobs.isEmpty()) {
+				// We haven't had any jobs leave which means that some have joined our status.
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < lstJoinedJobs.size(); i++) {
+					sb.append("\n"+lstJoinedJobs.get(i).getName());
+				}
+				tray.showMessage("Jobs have Joined Worst Colour", "The overall build worst colour hasn't changed, but the following projects have worsened, and joined this colour:" + sb.toString(), TrayIcon.MessageType.ERROR);
+			} else if (lstJoinedJobs.isEmpty()) {
+				// We haven't had any jobs join which means that some have left our status.
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < lstLeftJobs.size(); i++) {
+					sb.append("\n"+lstLeftJobs.get(i).getName());
+				}
+				tray.showMessage("Jobs have left Worst Colour", "The overall build worst colour hasn't changed, but the following projects have improved away from this colour:" + sb.toString(), TrayIcon.MessageType.INFO);
+			} else {
+				// We had jobs join and leave our status.
+				StringBuilder sbleft = new StringBuilder();
+				for (int i = 0; i < lstLeftJobs.size(); i++) {
+					sbleft.append("\n"+lstLeftJobs.get(i).getName());
+				}
+				StringBuilder sbjoin = new StringBuilder();
+				for (int i = 0; i < lstJoinedJobs.size(); i++) {
+					sbjoin.append("\n"+lstJoinedJobs.get(i).getName());
+				}
+				tray.showMessage("Jobs have joined and left Worst Colour", "The overall build worst colour hasn't changed, but the following projects have worsened, and joined this colour:" + sbjoin.toString() + "\nThe following projects have improved away from this colour:" + sbleft.toString(), TrayIcon.MessageType.INFO);
+			}
 		}
 		// OK we've got the full status, let's fire the actions
 		Action action = prefs.getAction(colourPrevious, colourCurrent, buildChanged);
