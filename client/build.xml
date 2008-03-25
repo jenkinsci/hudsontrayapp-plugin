@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="completecycle" name="HudsonTrayApp">
+	
+	<path id="project.classpath">
+		<pathelement location="lib/junit-4.4.jar"/>
+	</path>
+	
+	<target name="completecycle" depends="clean,build,jar,signjar"/>
+	
+	<target name="init">
+		<mkdir dir="bin"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="bin"/>
+		<delete dir="dist"/>
+	</target>
+
+	<target name="build" depends="init">
+		<echo message="${ant.project.name}: ${ant.file}"/>
+		<javac destdir="bin" debug="true" source="1.6" target="1.6">
+			<src path="src"/>
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+	
+	<target name="jar">
+		<mkdir dir="bin/META-INF" />
+		<copy todir="bin">
+			<fileset dir="src" casesensitive="no" includes="**/*.gif,**/*.jpg,**/*.svg,**/*.png"/>
+		</copy>
+	
+		<manifest file="bin/META-INF/MANIFEST.MF" mode="replace">
+			<attribute name="Main-Class" value="org.hudson.trayapp.HudsonTrayApp"/>
+		</manifest>
+		<mkdir dir="dist" />
+		<jar destfile="dist/HudsonTrayApp.jar" basedir="bin" manifest="bin/META-INF/MANIFEST.MF" />
+	</target>
+	
+	<target name="signjar">
+		<signjar jar="dist/HudsonTrayApp.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
+	</target>
+	
+	<target name="help">
+		<echo message="Please run: $ ant -v -projecthelp" />
+	</target>
+</project>
