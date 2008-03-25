@@ -126,6 +126,14 @@ public class Job {
 	public String getUrl() {
 		return url;
 	}
+	
+	/**
+	 * Note this method is far from complete. Right now it encapsulates " "'s with %20's and that's it.
+	 * @return
+	 */
+	public String getRFC2396CompliantURL() {
+		return url.replace(" ", "%20");
+	}
 
 	public String getColour() {
 		return getColour(colour);
