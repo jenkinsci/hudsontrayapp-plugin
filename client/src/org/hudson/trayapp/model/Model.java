@@ -139,6 +139,21 @@ public class Model{
 		return vecWorst;
 	}
 	
+	public int getWorstJobsWorstHealth() {
+		List<Job> worstJobs = getWorstJobs(false);
+		int health = 101;
+		for (int i = 0; i < worstJobs.size(); i++) {
+			int jobHealth = worstJobs.get(i).getWorstHealthScore();
+			if (jobHealth != -1) {
+				health = Math.min(health, jobHealth);
+			}
+		}
+		if (health == 101){
+			health = -1;
+		}
+		return health;
+	}
+	
 	/**
 	 * This method will return the worst colour as a string across all of the servers.
 	 * @param fromPrevious This flag should be set to true, if you want to get the worst colour
