@@ -112,7 +112,7 @@ public class HudsonTrayApp {
 		
 		Integer colourCurrent = Job.convertColour(model.getWorstColour(false));
 		MainFrame.getMainFrameInstance().updateResults();
-		tray.setWorstCaseColour(Job.getColour(colourCurrent));
+		tray.setWorstCaseColour(Job.getColour(colourCurrent), model.getWorstJobsWorstHealth());
 
 		StringBuilder sb;
 		List<Job> worstJobs = model.getWorstJobs(false);
