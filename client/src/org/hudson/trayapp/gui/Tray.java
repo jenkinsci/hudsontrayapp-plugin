@@ -15,39 +15,20 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import org.hudson.trayapp.HudsonTrayApp;
+import org.hudson.trayapp.gui.tray.AnimatedTrayIcon;
+import org.hudson.trayapp.gui.tray.HudsonTrayIconHelper;
 import org.hudson.trayapp.model.Job;
 
 public class Tray {
 	final private SystemTray tray;
 	final private TrayIcon trayIcon;
-
-	private final static Image BLUE_ANIME = Toolkit.getDefaultToolkit().getImage(Tray.class.getResource("/org/hudson/trayapp/gui/icons/tray/blue_anime.gif"));
-	private final static Image BLUE = Toolkit.getDefaultToolkit().getImage(Tray.class.getResource("/org/hudson/trayapp/gui/icons/tray/blue.gif"));
-	private final static Image GREY_ANIME = Toolkit.getDefaultToolkit().getImage(Tray.class.getResource("/org/hudson/trayapp/gui/icons/tray/grey_anime.gif"));
-	private final static Image GREY = Toolkit.getDefaultToolkit().getImage(Tray.class.getResource("/org/hudson/trayapp/gui/icons/tray/grey.gif"));
-	private final static Image RED_ANIME = Toolkit.getDefaultToolkit().getImage(Tray.class.getResource("/org/hudson/trayapp/gui/icons/tray/red_anime.gif"));
-	private final static Image RED = Toolkit.getDefaultToolkit().getImage(Tray.class.getResource("/org/hudson/trayapp/gui/icons/tray/red.gif"));
-	private final static Image YELLOW_ANIME = Toolkit.getDefaultToolkit().getImage(Tray.class.getResource("/org/hudson/trayapp/gui/icons/tray/yellow_anime.gif"));
-	private final static Image YELLOW = Toolkit.getDefaultToolkit().getImage(Tray.class.getResource("/org/hudson/trayapp/gui/icons/tray/yellow.gif"));
 	
-	private final static Map<String, Image> COLOURSTOICONS = new HashMap<String, Image>(8);
-	static {
-		COLOURSTOICONS.put(Job.getColour(Job.BLUE), BLUE);
-		COLOURSTOICONS.put(Job.getColour(Job.BLUE_ANIME), BLUE_ANIME);
-		COLOURSTOICONS.put(Job.getColour(Job.GREY), GREY);
-//		COLOURSTOICONS.put(Job.getColour(Job.GREY_ANIME), GREY_ANIME);
-		COLOURSTOICONS.put(Job.getColour(Job.RED), RED);
-		COLOURSTOICONS.put(Job.getColour(Job.RED_ANIME), RED_ANIME);
-		COLOURSTOICONS.put(Job.getColour(Job.YELLOW), YELLOW);
-		COLOURSTOICONS.put(Job.getColour(Job.YELLOW_ANIME), YELLOW_ANIME);
-		
-	}
+	private AnimatedTrayIcon animatedTrayIcon;
+
 	public Tray() {
 		if (SystemTray.isSupported()) {
 			tray = SystemTray.getSystemTray();
@@ -77,6 +58,7 @@ public class Tray {
 		    };
 
 		    trayIcon = new TrayIcon(image);
+		    HudsonTrayIconHelper.prepare(trayIcon);
 		    setToolTip("");
 		    rebuildPopupMenu(new Vector<Job>(0));
 
@@ -108,9 +90,8 @@ public class Tray {
 		MainFrame.getMainFrameInstance().setVisible(true);
 	}
 
-	public void setWorstCaseColour(String colour) {
-		//trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/org/hudson/trayapp/gui/icons/16x16/" + colour + ".gif")));
-		trayIcon.setImage(COLOURSTOICONS.get(colour));
+	public void setWorstCaseColour(String colour, int health) {
+		setAnimatedTrayIcon(HudsonTrayIconHelper.getIcon(Job.convertColour(colour), health));
 	}
 	
 	public void showMessage(String caption, String message, MessageType type) {
@@ -182,5 +163,13 @@ public class Tray {
 	    popup.add(defaultItem);
 	    
 	    trayIcon.setPopupMenu(popup);
+	}
+	
+	public void setAnimatedTrayIcon(AnimatedTrayIcon icon) {
+		if (this.animatedTrayIcon != null) {
+			animatedTrayIcon.stop();
+		}
+		this.animatedTrayIcon = icon;
+		icon.start();
 	}
 }
