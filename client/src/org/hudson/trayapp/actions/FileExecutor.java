@@ -1,12 +1,13 @@
 package org.hudson.trayapp.actions;
 
-import java.awt.TrayIcon;
+import org.jdesktop.jdic.tray.TrayIcon;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 import org.hudson.trayapp.HudsonTrayApp;
 import org.hudson.trayapp.model.Job;
+import org.hudson.trayapp.util.XMLHelper;
 import org.iharder.Base64;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -26,7 +27,7 @@ public class FileExecutor implements Action {
 						+ fileToExecute + "\n"
 						+ "Exception thrown when running this file:\n"
 						+ e.getLocalizedMessage(),
-						TrayIcon.MessageType.ERROR
+						TrayIcon.ERROR_MESSAGE_TYPE
 				);
 			}
 		}
@@ -57,7 +58,7 @@ public class FileExecutor implements Action {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			String name = node.getNodeName();
-			String value = node.getTextContent();
+			String value = XMLHelper.getTextContent(node);
 			if (name.equals("fileToExecute")) {
 				process(node.getChildNodes());
 			} else if (name.equals("file")) {
