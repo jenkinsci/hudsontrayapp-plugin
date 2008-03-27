@@ -8,12 +8,16 @@ import java.util.Map;
 
 import org.hudson.trayapp.actions.Action;
 import org.hudson.trayapp.actions.FileExecutor;
+import org.hudson.trayapp.util.XMLHelper;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Preferences {
 	
 	private int updateFrequency = 5;
+	private boolean showHealthIcon = false;
+	private boolean showAnimatedBuilds = true;
+	private boolean showPopupNotifications = true;
 
 	private class State {
 		Integer colourFrom;
@@ -63,7 +67,7 @@ public class Preferences {
 			w.write("<from>"); w.write(Job.getColour(colourFrom)); w.write("</from>");
 			w.write("<to>"); w.write(Job.getColour(colourTo)); w.write("</to>");
 			w.write("<changed>"); w.write(build.equals(Job.BUILD_CHANGED) ? "Y": "N"); w.write("</changed>");
-			Action action = Preferences.this.actions.get(this);
+			Action action = (Action) Preferences.this.actions.get(this);
 			action.writeXML(w);
 			w.write("</state>");
 		}
@@ -73,7 +77,7 @@ public class Preferences {
 			for (int i = 0; i < nodes.getLength(); i++) {
 				Node node = nodes.item(i);
 				String name = node.getNodeName();
-				String value = node.getTextContent();
+				String value = XMLHelper.getTextContent(node);
 				if (name.equals("state")) {
 					process(node.getChildNodes());
 				} else if (name.equals("from")) {
@@ -94,7 +98,7 @@ public class Preferences {
 		}
 	}
 
-	private HashMap<State, Action> actions = new HashMap<State, Action>();
+	private HashMap actions = new HashMap();
 
 	public void setAction(final Integer colourFrom, final Integer colourTo, final Integer buildChanged, final String actionString) {
 		FileExecutor action = new FileExecutor();
@@ -103,10 +107,10 @@ public class Preferences {
 	}
 
 	public Action getAction(final Integer colourFrom, final Integer colourTo, final Integer buildChanged) {
-		return actions.get(new State(colourFrom, colourTo, buildChanged));
+		return (Action) actions.get(new State(colourFrom, colourTo, buildChanged));
 	}
 
-	public Preferences clone() {
+	public Object clone() {
 		Preferences preferences = new Preferences();
 		preferences.actions.putAll(actions);
 		return preferences;
@@ -115,11 +119,11 @@ public class Preferences {
 	public boolean equals(Object o) {
 		if (o instanceof Preferences) {
 			Preferences preferences = (Preferences) o;
-			Iterator<Map.Entry<State, Action>> iterator = actions.entrySet().iterator();
+			Iterator iterator = actions.entrySet().iterator();
 			boolean bool = true;
 			while (bool && iterator.hasNext()) {
-				Map.Entry<State, Action> entry = iterator.next();
-				Action action = preferences.actions.get(entry.getKey());
+				Map.Entry entry = (Map.Entry) iterator.next();
+				Action action = (Action) preferences.actions.get(entry.getKey());
 				bool = entry.getValue().equals(action);
 			}
 			/*
@@ -147,9 +151,12 @@ public class Preferences {
 	public void writeXML(Writer w) throws IOException {
 		w.write("<preferences>");
 		w.write("<updateFrequency>"); w.write(Integer.toString(updateFrequency)); w.write("</updateFrequency>");
-		Iterator<Map.Entry<State, Action>> iterEntries = actions.entrySet().iterator();
+		w.write("<trayshowhealth>"); w.write(showHealthIcon ? "Y": "N"); w.write("</trayshowhealth>");
+		w.write("<trayshowanimation>"); w.write(showAnimatedBuilds ? "Y": "N"); w.write("</trayshowanimation>");
+		w.write("<trayshowpopup>"); w.write(showPopupNotifications ? "Y": "N"); w.write("</trayshowpopup>");
+		Iterator iterEntries = actions.entrySet().iterator();
 		while (iterEntries.hasNext()) {
-			iterEntries.next().getKey().writeXML(w);
+			((State) ((Map.Entry) iterEntries.next()).getKey()).writeXML(w);
 		}
 		w.write("</preferences>");
 	}
@@ -158,16 +165,46 @@ public class Preferences {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			String name = node.getNodeName();
-			String value = node.getTextContent();
+			String value = XMLHelper.getTextContent(node);
 			if (name.equals("preferences")) {
 				process(node.getChildNodes());
 			} else if (name.equals("updateFrequency")) {
 				updateFrequency = Integer.parseInt(value);
+			} else if (name.equals("trayshowhealth")) {
+				showHealthIcon = value.equals("Y");
+			} else if (name.equals("trayshowanimation")) {
+				showAnimatedBuilds = value.equals("Y");
+			} else if (name.equals("trayshowpopup")) {
+				showPopupNotifications = value.equals("Y");
 			} else if (name.equals("state")) {
 				State state = new State();
 				Action action = state.process(node.getChildNodes());
 				actions.put(state, action);
 			}
 		}
+	}
+
+	public boolean isShowHealthIcon() {
+		return showHealthIcon;
+	}
+
+	public void setShowHealthIcon(boolean showHealthIcon) {
+		this.showHealthIcon = showHealthIcon;
+	}
+
+	public boolean isShowAnimatedBuilds() {
+		return showAnimatedBuilds;
+	}
+
+	public void setShowAnimatedBuilds(boolean showAnimatedBuilds) {
+		this.showAnimatedBuilds = showAnimatedBuilds;
+	}
+
+	public boolean isShowPopupNotifications() {
+		return showPopupNotifications;
+	}
+
+	public void setShowPopupNotifications(boolean showPopupNotifications) {
+		this.showPopupNotifications = showPopupNotifications;
 	}
 }
