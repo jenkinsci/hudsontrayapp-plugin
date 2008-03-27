@@ -3,6 +3,7 @@
 	
 	<path id="project.classpath">
 		<pathelement location="lib/junit-4.4.jar"/>
+		<pathelement location="lib/jdic-0.9.4-bin-cross-platform/jdic.jar"/>
 	</path>
 	
 	<target name="completecycle" depends="clean,build,jar,signjar"/>
@@ -18,7 +19,7 @@
 
 	<target name="build" depends="init">
 		<echo message="${ant.project.name}: ${ant.file}"/>
-		<javac destdir="bin" debug="true" source="1.6" target="1.6">
+		<javac destdir="bin" debug="true" source="1.4" target="1.4">
 			<src path="src"/>
 			<classpath refid="project.classpath"/>
 		</javac>
@@ -35,10 +36,34 @@
 		</manifest>
 		<mkdir dir="dist" />
 		<jar destfile="dist/HudsonTrayApp.jar" basedir="bin" manifest="bin/META-INF/MANIFEST.MF" />
+		
+		<mkdir dir="dist/win" />
+		<mkdir dir="dist/win/x86" />
+		<mkdir dir="dist/lin" />
+		<mkdir dir="dist/lin/x86" />
+		<mkdir dir="dist/sun" />
+		<mkdir dir="dist/sun/x86" />
+		<mkdir dir="dist/sun/sparc" />
+		<jar destfile="dist/win/x86/jdic-native.jar" basedir="lib/jdic-0.9.4-bin-cross-platform/windows/x86"/>
+		<jar destfile="dist/lin/x86/jdic-native.jar" basedir="lib/jdic-0.9.4-bin-cross-platform/linux/x86"/>
+		<jar destfile="dist/sun/x86/jdic-native.jar" basedir="lib/jdic-0.9.4-bin-cross-platform/sunos/x86"/>
+		<jar destfile="dist/sun/sparc/jdic-native.jar" basedir="lib/jdic-0.9.4-bin-cross-platform/sunos/sparc"/>
+		<copy file="lib/jdic-0.9.4-bin-cross-platform/jdic.jar" todir="dist" />
+		<copy file="lib/jdic-0.9.4-bin-cross-platform/windows/jdic_stub.jar" todir="dist/win" />
+		<copy file="lib/jdic-0.9.4-bin-cross-platform/linux/jdic_stub.jar" todir="dist/lin" />
+		<copy file="lib/jdic-0.9.4-bin-cross-platform/sunos/jdic_stub.jar" todir="dist/sun" />
 	</target>
 	
 	<target name="signjar">
 		<signjar jar="dist/HudsonTrayApp.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
+		<signjar jar="dist/jdic.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
+		<signjar jar="dist/win/jdic_stub.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
+		<signjar jar="dist/lin/jdic_stub.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
+		<signjar jar="dist/sun/jdic_stub.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
+		<signjar jar="dist/win/x86/jdic-native.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
+		<signjar jar="dist/lin/x86/jdic-native.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
+		<signjar jar="dist/sun/x86/jdic-native.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
+		<signjar jar="dist/sun/sparc/jdic-native.jar" alias="HudsonTrayApp" storepass="hudsontrayappstorepass" keypass="hudsontrayappkeypass" keystore=".trayappkeystore"/>
 	</target>
 	
 	<target name="help">
