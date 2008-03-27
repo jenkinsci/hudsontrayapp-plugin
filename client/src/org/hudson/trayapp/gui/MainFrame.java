@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -55,7 +54,12 @@ import org.hudson.trayapp.model.Job;
 import org.hudson.trayapp.model.Model;
 import org.hudson.trayapp.model.Preferences;
 import org.hudson.trayapp.model.Server;
+import org.jdesktop.jdic.desktop.Desktop;
+import org.jdesktop.jdic.desktop.DesktopException;
+import org.jdesktop.jdic.tray.TrayIcon;
+
 import javax.swing.ListSelectionModel;
+import javax.swing.JCheckBox;
 
 public class MainFrame extends JFrame implements HyperlinkListener{
 
@@ -221,11 +225,19 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 	private JTextField greyToGreyUnchangedField = null;
 	private JTextField greyToGreyChangedField = null;
 	private Model model = null;
-	private Preferences prefs = null;
+	private Preferences prefs = null;  //  @jve:decl-index=0:
 	private ServerListModel serverListModel = null;
 	private JPanel serverNamePanel = null;
 	private JPanel serverChangesApplyPanel = null;
 	private JButton applyServerChangesButton = null;
+	private JPanel uiConfigurationPanel = null;
+	private JPanel trayIconConfigurationPanel = null;
+	private JLabel showHealthLabel = null;
+	private JCheckBox showHealthCB = null;
+	private JLabel showAnimatedBuildLabel = null;
+	private JCheckBox showAnimatedBuildCB = null;
+	private JLabel showPopupNotificationLabel = null;
+	private JCheckBox showPopupNotificationCB = null;
 	/**
 	 * This is the default constructor
 	 */
@@ -365,11 +377,10 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 			configurationList.setPreferredSize(new Dimension(100, 100));
 			configurationList.setModel(new ListModel() {
 
-				final String[] SA = new String[]{"Server", "Actions"};
+				final String[] SA = new String[]{"Server", "Actions", "UI Config"};
 				/* (non-Javadoc)
 				 * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
 				 */
-				@Override
 				public void addListDataListener(ListDataListener l) {
 					// The data model shouldn't change for this
 				}
@@ -377,7 +388,6 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 				/* (non-Javadoc)
 				 * @see javax.swing.ListModel#getElementAt(int)
 				 */
-				@Override
 				public Object getElementAt(int index) {
 
 					return SA[index];
@@ -386,15 +396,13 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 				/* (non-Javadoc)
 				 * @see javax.swing.ListModel#getSize()
 				 */
-				@Override
 				public int getSize() {
-					return 2;
+					return 3;
 				}
 
 				/* (non-Javadoc)
 				 * @see javax.swing.ListModel#removeListDataListener(javax.swing.event.ListDataListener)
 				 */
-				@Override
 				public void removeListDataListener(ListDataListener l) {
 					// The data model shouldn't change for this
 				}
@@ -411,6 +419,9 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 			             } else if (index == 1) {
 			            	 updateConfigurationPanelFromPreferences();
 			            	 layout.show(configurationRightPanel, getActionConfigurationPanel().getName());
+			             } else if (index == 2) {
+			            	 updateUIConfigurationFromPreferences();
+			            	 layout.show(configurationRightPanel, getUiConfigurationPanel().getName());
 			             }
 			          }
 			     }
@@ -431,6 +442,7 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 			configurationRightPanel.setLayout(new CardLayout());
 			configurationRightPanel.add(getServerConfigurationPane(), getServerConfigurationPane().getName());
 			configurationRightPanel.add(getActionConfigurationPanel(), getActionConfigurationPanel().getName());
+			configurationRightPanel.add(getUiConfigurationPanel(), getUiConfigurationPanel().getName());
 		}
 		return configurationRightPanel;
 	}
@@ -547,11 +559,9 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 	    if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 	    	System.out.println(event.getURL().toString());
 	    	try {
-	    		Desktop.getDesktop().browse(event.getURL().toURI());
-	    	} catch(IOException ioe) {
-	    		ioe.printStackTrace();
-	    	} catch(URISyntaxException urise) {
-	    		urise.printStackTrace();
+	    		Desktop.browse(event.getURL());
+	    	} catch(DesktopException de) {
+	    		HudsonTrayApp.getHudsonTrayAppInstance().getTray().showMessage("Error launching Browser", "Couldn't launch the url:\n"+event.getURL().toString(), TrayIcon.ERROR_MESSAGE_TYPE);
 	    	}
 	    }
 	}
@@ -972,24 +982,24 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 		String iconFrom = "";
 		String iconTo = "";
 		String buildString = "";
-		if (preferencesFrom.intValue() == Job.RED) iconFrom = "red";
-		if (preferencesFrom.intValue() == Job.RED_ANIME) iconFrom = "red_anime";
-		if (preferencesFrom.intValue() == Job.YELLOW) iconFrom = "yellow";
-		if (preferencesFrom.intValue() == Job.YELLOW_ANIME) iconFrom = "yellow_anime";
-		if (preferencesFrom.intValue() == Job.BLUE) iconFrom = "blue";
-		if (preferencesFrom.intValue() == Job.BLUE_ANIME) iconFrom = "blue_anime";
-		if (preferencesFrom.intValue() == Job.GREY) iconFrom = "grey";
+		if (preferencesFrom.intValue() == Job.RED.intValue()) iconFrom = "red";
+		if (preferencesFrom.intValue() == Job.RED_ANIME.intValue()) iconFrom = "red_anime";
+		if (preferencesFrom.intValue() == Job.YELLOW.intValue()) iconFrom = "yellow";
+		if (preferencesFrom.intValue() == Job.YELLOW_ANIME.intValue()) iconFrom = "yellow_anime";
+		if (preferencesFrom.intValue() == Job.BLUE.intValue()) iconFrom = "blue";
+		if (preferencesFrom.intValue() == Job.BLUE_ANIME.intValue()) iconFrom = "blue_anime";
+		if (preferencesFrom.intValue() == Job.GREY.intValue()) iconFrom = "grey";
 
-		if (preferencesTo.intValue() == Job.RED) iconTo = "red";
-		if (preferencesTo.intValue() == Job.RED_ANIME) iconTo = "red_anime";
-		if (preferencesTo.intValue() == Job.YELLOW) iconTo = "yellow";
-		if (preferencesTo.intValue() == Job.YELLOW_ANIME) iconTo = "yellow_anime";
-		if (preferencesTo.intValue() == Job.BLUE) iconTo = "blue";
-		if (preferencesTo.intValue() == Job.BLUE_ANIME) iconTo = "blue_anime";
-		if (preferencesTo.intValue() == Job.GREY) iconTo = "grey";
+		if (preferencesTo.intValue() == Job.RED.intValue()) iconTo = "red";
+		if (preferencesTo.intValue() == Job.RED_ANIME.intValue()) iconTo = "red_anime";
+		if (preferencesTo.intValue() == Job.YELLOW.intValue()) iconTo = "yellow";
+		if (preferencesTo.intValue() == Job.YELLOW_ANIME.intValue()) iconTo = "yellow_anime";
+		if (preferencesTo.intValue() == Job.BLUE.intValue()) iconTo = "blue";
+		if (preferencesTo.intValue() == Job.BLUE_ANIME.intValue()) iconTo = "blue_anime";
+		if (preferencesTo.intValue() == Job.GREY.intValue()) iconTo = "grey";
 
-		if (preferencesBuildType.intValue() == Job.BUILD_CHANGED) buildString = "Build Changed";
-		if (preferencesBuildType.intValue() == Job.BUILD_UNCHANGED) buildString = "Build Unchanged";
+		if (preferencesBuildType.intValue() == Job.BUILD_CHANGED.intValue()) buildString = "Build Changed";
+		if (preferencesBuildType.intValue() == Job.BUILD_UNCHANGED.intValue()) buildString = "Build Unchanged";
 
 		JLabel label;
 		GridBagConstraints constraints;
@@ -1479,6 +1489,18 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 		prefs.setAction(colourFrom, colourTo, buildType, field.getText());
 	}
 	
+	private void updatePreferencesFromUIConfiguration() {
+		prefs.setShowAnimatedBuilds(showAnimatedBuildCB.isSelected());
+		prefs.setShowHealthIcon(showHealthCB.isSelected());
+		prefs.setShowPopupNotifications(showPopupNotificationCB.isSelected());
+	}
+	
+	private void updateUIConfigurationFromPreferences() {
+		showAnimatedBuildCB.setSelected(prefs.isShowAnimatedBuilds());
+		showHealthCB.setSelected(prefs.isShowHealthIcon());
+		showPopupNotificationCB.setSelected(prefs.isShowPopupNotifications());
+	}
+	
 	public void setModel(Model model) {
 		this.model = model;
 		updateServerListModel(model);
@@ -1576,5 +1598,107 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 			});
 		}
 		return applyServerChangesButton;
+	}
+
+	/**
+	 * This method initializes uiConfigurationPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getUiConfigurationPanel() {
+		if (uiConfigurationPanel == null) {
+			GridLayout gridLayout2 = new GridLayout();
+			gridLayout2.setRows(2);
+			gridLayout2.setColumns(1);
+			uiConfigurationPanel = new JPanel();
+			uiConfigurationPanel.setLayout(gridLayout2);
+			uiConfigurationPanel.setName("uiConfigurationPanel");
+			uiConfigurationPanel.add(getTrayIconConfigurationPanel(), null);
+		}
+		return uiConfigurationPanel;
+	}
+
+	/**
+	 * This method initializes trayIconConfigurationPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getTrayIconConfigurationPanel() {
+		if (trayIconConfigurationPanel == null) {
+			showPopupNotificationLabel = new JLabel();
+			showPopupNotificationLabel.setText("Show Popup Notifications");
+			showPopupNotificationLabel.setToolTipText("Note: Messages will show for Java Exceptions regardless of this setting");
+			showAnimatedBuildLabel = new JLabel();
+			showAnimatedBuildLabel.setText("Show Animation when Building");
+			showHealthLabel = new JLabel();
+			showHealthLabel.setText("Show Health Icons on System Tray");
+			GridLayout gridLayout3 = new GridLayout();
+			gridLayout3.setRows(3);
+			gridLayout3.setHgap(0);
+			gridLayout3.setColumns(2);
+			trayIconConfigurationPanel = new JPanel();
+			trayIconConfigurationPanel.setLayout(gridLayout3);
+			trayIconConfigurationPanel.setBorder(BorderFactory.createTitledBorder(null, "Tray Icon Configuration", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font("Dialog", Font.BOLD, 12), new Color(51, 51, 51)));
+			trayIconConfigurationPanel.add(showHealthLabel, null);
+			trayIconConfigurationPanel.add(getShowHealthCB(), null);
+			trayIconConfigurationPanel.add(showAnimatedBuildLabel, null);
+			trayIconConfigurationPanel.add(getShowAnimatedBuildCB(), null);
+			trayIconConfigurationPanel.add(showPopupNotificationLabel, null);
+			trayIconConfigurationPanel.add(getShowPopupNotificationCB(), null);
+		}
+		return trayIconConfigurationPanel;
+	}
+
+	/**
+	 * This method initializes showHealthCB	
+	 * 	
+	 * @return javax.swing.JCheckBox	
+	 */
+	private JCheckBox getShowHealthCB() {
+		if (showHealthCB == null) {
+			showHealthCB = new JCheckBox();
+			showHealthCB.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					updatePreferencesFromUIConfiguration();
+					HudsonTrayApp.getHudsonTrayAppInstance().updateTrayIcon();
+				}
+			});
+		}
+		return showHealthCB;
+	}
+
+	/**
+	 * This method initializes showAnimatedBuildCB	
+	 * 	
+	 * @return javax.swing.JCheckBox	
+	 */
+	private JCheckBox getShowAnimatedBuildCB() {
+		if (showAnimatedBuildCB == null) {
+			showAnimatedBuildCB = new JCheckBox();
+			showAnimatedBuildCB.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					updatePreferencesFromUIConfiguration();
+					HudsonTrayApp.getHudsonTrayAppInstance().updateTrayIcon();
+				}
+			});
+		}
+		return showAnimatedBuildCB;
+	}
+
+	/**
+	 * This method initializes showPopupNotificationCB	
+	 * 	
+	 * @return javax.swing.JCheckBox	
+	 */
+	private JCheckBox getShowPopupNotificationCB() {
+		if (showPopupNotificationCB == null) {
+			showPopupNotificationCB = new JCheckBox();
+			showPopupNotificationCB.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					updatePreferencesFromUIConfiguration();
+				}
+			});
+		}
+		return showPopupNotificationCB;
 	}
 }  //  @jve:decl-index=0:visual-constraint="0,-42"
