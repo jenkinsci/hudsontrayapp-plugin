@@ -1,5 +1,6 @@
 package org.hudson.trayapp.model.job;
 
+import org.hudson.trayapp.util.XMLHelper;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -30,7 +31,7 @@ public class HealthReport {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			String name = node.getNodeName();
-			String value = node.getTextContent();
+			String value = XMLHelper.getTextContent(node);
 			if (name.equals("description")) {
 				description = value;
 			} else if (name.equals("score")) {
@@ -39,7 +40,7 @@ public class HealthReport {
 		}
 	}
 
-	public HealthReport clone() {
+	public Object clone() {
 		HealthReport report = new HealthReport();
 		report.score = score;
 		report.description = description;

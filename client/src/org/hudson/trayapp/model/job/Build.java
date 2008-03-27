@@ -1,5 +1,6 @@
 package org.hudson.trayapp.model.job;
 
+import org.hudson.trayapp.util.XMLHelper;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -29,7 +30,7 @@ public class Build {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			String name = node.getNodeName();
-			String value = node.getTextContent();
+			String value = XMLHelper.getTextContent(node);
 			if (name.equals("url")) {
 				url = value;
 			} else if (name.equals("number")) {
@@ -38,7 +39,7 @@ public class Build {
 		}
 	}
 	
-	public Build clone() {
+	public Object clone() {
 		Build build = new Build();
 		build.number = number;
 		build.url = url;

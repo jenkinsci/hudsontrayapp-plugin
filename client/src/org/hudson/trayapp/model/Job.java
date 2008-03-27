@@ -13,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.hudson.trayapp.model.job.Build;
 import org.hudson.trayapp.model.job.HealthReport;
+import org.hudson.trayapp.util.XMLHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -30,27 +31,27 @@ public class Job {
 	private Build lastFailedBuild;
 	private Build lastSuccessfulBuild;
 
-	private List<HealthReport> healthReports = new Vector<HealthReport>();
+	private List healthReports = new Vector();
 
-	public final static Integer RED = Integer.valueOf(1);
+	public final static Integer RED = new Integer(1);
 
-	public final static Integer RED_ANIME = Integer.valueOf(2);
+	public final static Integer RED_ANIME = new Integer(2);
 
-	public final static Integer YELLOW = Integer.valueOf(3);
+	public final static Integer YELLOW = new Integer(3);
 
-	public final static Integer YELLOW_ANIME = Integer.valueOf(4);
+	public final static Integer YELLOW_ANIME = new Integer(4);
 
-	public final static Integer BLUE = Integer.valueOf(5);
+	public final static Integer BLUE = new Integer(5);
 
-	public final static Integer BLUE_ANIME = Integer.valueOf(6);
+	public final static Integer BLUE_ANIME = new Integer(6);
 
-	public final static Integer GREY = Integer.valueOf(7);
+	public final static Integer GREY = new Integer(7);
 
-	public final static Integer BUILD_CHANGED = Integer.valueOf(8);
+	public final static Integer BUILD_CHANGED = new Integer(8);
 
-	public final static Integer BUILD_UNCHANGED = Integer.valueOf(9);
+	public final static Integer BUILD_UNCHANGED = new Integer(9);
 
-	private final static Map<Integer, String> COLOURSTOSTRING = new HashMap<Integer, String>();
+	private final static Map COLOURSTOSTRING = new HashMap();
 
 	static {
 		COLOURSTOSTRING.put(RED, "red");
@@ -72,7 +73,7 @@ public class Job {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			String name = node.getNodeName();
-			String value = node.getTextContent();
+			String value = XMLHelper.getTextContent(node);
 			if (name.equals("name")) {
 				this.name = value;
 			} else if (name.equals("url")) {
@@ -132,7 +133,7 @@ public class Job {
 	 * @return
 	 */
 	public String getRFC2396CompliantURL() {
-		return url.replace(" ", "%20");
+		return url.replaceAll(" ", "%20");
 	}
 
 	public String getColour() {
@@ -140,23 +141,23 @@ public class Job {
 	}
 
 	public static String getColour(Integer colour) {
-		return COLOURSTOSTRING.get(colour);
+		return (String) COLOURSTOSTRING.get(colour);
 	}
 
-	public Job clone() {
+	public Object clone() {
 		Job jobReturn = new Job();
 		jobReturn.colour = colour;
 		jobReturn.name = name;
 		jobReturn.url = url;
 		if (lastBuild != null)
-			jobReturn.lastBuild = lastBuild.clone();
+			jobReturn.lastBuild = (Build) lastBuild.clone();
 		if (lastFailedBuild != null)
-			jobReturn.lastFailedBuild = lastFailedBuild.clone();
+			jobReturn.lastFailedBuild = (Build) lastFailedBuild.clone();
 		if (lastSuccessfulBuild != null)
-			jobReturn.lastSuccessfulBuild = lastSuccessfulBuild.clone();
-		Iterator<HealthReport> iterReports = healthReports.iterator();
+			jobReturn.lastSuccessfulBuild = (Build) lastSuccessfulBuild.clone();
+		Iterator iterReports = healthReports.iterator();
 		while (iterReports.hasNext()) {
-			jobReturn.healthReports.add(iterReports.next().clone());
+			jobReturn.healthReports.add(((HealthReport) iterReports.next()).clone());
 		}
 		return jobReturn;
 	}
@@ -196,13 +197,13 @@ public class Job {
 	 * @return Either the Integer for the colour, or null if it couldn't be matched.
 	 */
 	public static Integer convertColour(String colour) {
-		Iterator<Map.Entry<Integer, String>> iterator = COLOURSTOSTRING.entrySet().iterator();
+		Iterator iterator = COLOURSTOSTRING.entrySet().iterator();
 
 		Integer integer = null;
 		while (integer == null && iterator.hasNext()) {
-			Map.Entry<Integer, String> entry = iterator.next();
+			Map.Entry entry = (Map.Entry) iterator.next();
 			if (entry.getValue().equals(colour)) {
-				integer = entry.getKey();
+				integer = (Integer) entry.getKey();
 			}
 		}
 
@@ -219,16 +220,16 @@ public class Job {
 	 * many health reports, or will return null, indicating that this job does not support Health reporting. Typically
 	 * this is for Hudson servers prior to build 173.
 	 */
-	public List<HealthReport> getWorstHealth() {
+	public List getWorstHealth() {
 		// The first thing we do is confirm that we even have any reports. If not return null.
 		if (healthReports.size() == 0) {
 			return null;
 		}
-		List<HealthReport> list = new Vector<HealthReport>();
+		List list = new Vector();
 		int score = 100;
-		Iterator<HealthReport> iterator = healthReports.iterator();
+		Iterator iterator = healthReports.iterator();
 		while (iterator.hasNext()) {
-			HealthReport report = iterator.next();
+			HealthReport report = (HealthReport) iterator.next();
 			/*
 			 * First we check to see if the report is equal to our worst case. If so, add the health report to the
 			 * returning list.
@@ -255,7 +256,7 @@ public class Job {
 	 * @return
 	 */
 	public int getWorstHealthScore() {
-		List<HealthReport> list = getWorstHealth();
+		List list = getWorstHealth();
 		if (list == null) {
 			return -1;
 		}
@@ -263,7 +264,7 @@ public class Job {
 			return 100;
 		}
 		// We know that the List must contain something, thus we can confidently call this final method.
-		return list.get(0).getScore();
+		return ((HealthReport) list.get(0)).getScore();
 	}
 
 	/**

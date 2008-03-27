@@ -16,19 +16,19 @@ public class Model{
 
 	public final static String[] colours = {"red_anime","red","yellow_anime","yellow","blue_anime","blue","disabled_anime","disabled","aborted_anime","aborted"};
 	
-	private List<Server> servers;
-	private List<Server> previousServers;
+	private List servers;
+	private List previousServers;
 
 	public Model() {
-		servers = new Vector<Server>();
-		previousServers = new Vector<Server>();
+		servers = new Vector();
+		previousServers = new Vector();
 	}
 
-	public Model clone() {
+	public Object clone() {
 		Model modelReturn = new Model();
-		Iterator<Server> iterator = servers.iterator();
+		Iterator iterator = servers.iterator();
 		while (iterator.hasNext()) {
-			Server server = iterator.next();
+			Server server = (Server) iterator.next();
 			modelReturn.servers.add(server.clone());
 		}
 		return modelReturn;
@@ -39,7 +39,7 @@ public class Model{
 	}
 
 	public Server getServerAt(int index) {
-		return servers.get(index);
+		return (Server) servers.get(index);
 	}
 	
 	public int getServerIndex(String url) {
@@ -47,14 +47,14 @@ public class Model{
 	}
 	
 	public int getServerIndex(String url, boolean previous) {
-		Iterator<Server> iterServers;
+		Iterator iterServers;
 		if (previous)
 			iterServers = previousServers.iterator();
 		else
 			iterServers = servers.iterator();
 		int i = 0;
 		while (iterServers.hasNext()) {
-			if (url.equals(iterServers.next().getURL()))
+			if (url.equals(((Server) iterServers.next()).getURL()))
 				return i;
 			i++;
 		}
@@ -82,9 +82,9 @@ public class Model{
 		 * enable us to decide what actions we need to take once we've updated.
 		 */
 		previousServers.clear();
-		Iterator<Server> iterServers = servers.iterator();
+		Iterator iterServers = servers.iterator();
 		while (iterServers.hasNext()) {
-			Server server = iterServers.next();
+			Server server = (Server) iterServers.next();
 			previousServers.add(server.clone());
 		}
 		/*
@@ -92,7 +92,7 @@ public class Model{
 		 */
 		iterServers = servers.iterator();
 		while (iterServers.hasNext()) {
-			Server server = iterServers.next();
+			Server server = (Server) iterServers.next();
 			if (server.getURL().length() > 0) {
 				server.update();
 			}
@@ -108,17 +108,17 @@ public class Model{
 	 * from the previous update, or false if you want the current worst jobs.
 	 * @return This returns a collection (never null) of jobs that are the worst jobs overall.
 	 */
-	public List<Job> getWorstJobs(boolean fromPrevious) {
-		Vector<Job> vecWorst = new Vector<Job>();
+	public List getWorstJobs(boolean fromPrevious) {
+		Vector vecWorst = new Vector();
 		int worstCase = -1;
-		Iterator<Server> serveriter;
+		Iterator serveriter;
 		if (fromPrevious) {
 			serveriter = previousServers.iterator();
 		} else {
 			serveriter = servers.iterator();
 		}
 		while (serveriter.hasNext()) {
-			Server server = serveriter.next();
+			Server server = (Server) serveriter.next();
 			String colour = server.getColour();
 			// Note, the first time this runs, the previous colour will be null
 			if (colour != null) {
@@ -140,10 +140,10 @@ public class Model{
 	}
 	
 	public int getWorstJobsWorstHealth() {
-		List<Job> worstJobs = getWorstJobs(false);
+		List worstJobs = getWorstJobs(false);
 		int health = 101;
 		for (int i = 0; i < worstJobs.size(); i++) {
-			int jobHealth = worstJobs.get(i).getWorstHealthScore();
+			int jobHealth = ((Job) worstJobs.get(i)).getWorstHealthScore();
 			if (jobHealth != -1) {
 				health = Math.min(health, jobHealth);
 			}
@@ -161,11 +161,11 @@ public class Model{
 	 * @return This returns the current/previous worst colour, or "grey" if there are no jobs/servers defined
 	 */
 	public String getWorstColour(boolean fromPrevious) {
-		Collection<Job> jobs = getWorstJobs(fromPrevious);
+		Collection jobs = getWorstJobs(fromPrevious);
 		if (jobs.isEmpty()) {
 			return "grey";
 		} else {
-			return jobs.iterator().next().getColour();
+			return ((Job) jobs.iterator().next()).getColour();
 		}
 	}
 	
@@ -183,9 +183,9 @@ public class Model{
 	 */
 	public boolean getBuildChanged() {
 		//If any servers in the previous list aren't in the new list, this will return true
-		Iterator<Server> iterServerEntries = previousServers.iterator();
+		Iterator iterServerEntries = previousServers.iterator();
 		while (iterServerEntries.hasNext()) {
-			if (getServerIndex(iterServerEntries.next().getURL(), false) == -1) {
+			if (getServerIndex(((Server) iterServerEntries.next()).getURL(), false) == -1) {
 				// We have at least one server that has been removed, return true.
 				return true;
 			}
@@ -194,7 +194,7 @@ public class Model{
 		//If any of the current servers aren't in the previous list, this will return true.
 		iterServerEntries = servers.iterator();
 		while (iterServerEntries.hasNext()) {
-			if (getServerIndex(iterServerEntries.next().getURL(), true) == -1) {
+			if (getServerIndex(((Server) iterServerEntries.next()).getURL(), true) == -1) {
 				// We have at least one server that has been added, return true.
 				return true;
 			}
@@ -210,18 +210,18 @@ public class Model{
 		 * If after checking the above, nothing has changed, then it will inspect each job, and check
 		 * the build numbers. If any of the build numbers have changed, then this will return true.\n
 		*/
-		Collection<Job> jobsPrevious = getWorstJobs(true);
-		Collection<Job> jobsCurrent = getWorstJobs(false);
-		Map<String, Job> mapPrevious = new HashMap<String, Job>(jobsPrevious.size());
-		Iterator<Job> iterJobs = jobsPrevious.iterator();
+		Collection jobsPrevious = getWorstJobs(true);
+		Collection jobsCurrent = getWorstJobs(false);
+		Map mapPrevious = new HashMap(jobsPrevious.size());
+		Iterator iterJobs = jobsPrevious.iterator();
 		while (iterJobs.hasNext()) {
-			Job job = iterJobs.next();
+			Job job = (Job) iterJobs.next();
 			mapPrevious.put(job.getUrl(), job);
 		}
 		iterJobs = jobsCurrent.iterator();
 		while (iterJobs.hasNext()) {
-			Job jobCurrent = iterJobs.next();
-			Job jobPrevious = mapPrevious.get(jobCurrent.getUrl());
+			Job jobCurrent = (Job) iterJobs.next();
+			Job jobPrevious = (Job) mapPrevious.get(jobCurrent.getUrl());
 			if (jobCurrent.getLastBuild() == null && jobPrevious.getLastBuild() != null) {
 				// we have a mismatch between builds, this is a change
 				return true;
@@ -240,14 +240,14 @@ public class Model{
 		return false;
 	}
 	
-	public List<Job> getJobsLeftWorstBuild() {
-		List<Job> lstReturn = new Vector<Job>();
-		Collection<Job> jobsPrevious = getWorstJobs(true);
-		Collection<Job> jobsCurrent = getWorstJobs(false);
+	public List getJobsLeftWorstBuild() {
+		List lstReturn = new Vector();
+		Collection jobsPrevious = getWorstJobs(true);
+		Collection jobsCurrent = getWorstJobs(false);
 		
-		Iterator<Job> iterJobs = jobsPrevious.iterator();
+		Iterator iterJobs = jobsPrevious.iterator();
 		while (iterJobs.hasNext()) {
-			Job job = iterJobs.next();
+			Job job = (Job) iterJobs.next();
 			if (!(jobsCurrent.contains(job))) {
 				lstReturn.add(job);
 			}
@@ -255,15 +255,15 @@ public class Model{
 		return lstReturn;
 	}
 	
-	public List<Job> getJobsJoinedWorstBuild() {
-		List<Job> lstReturn = new Vector<Job>();
-		Collection<Job> jobsPrevious = getWorstJobs(true);
-		Collection<Job> jobsCurrent = getWorstJobs(false);
+	public List getJobsJoinedWorstBuild() {
+		List lstReturn = new Vector();
+		Collection jobsPrevious = getWorstJobs(true);
+		Collection jobsCurrent = getWorstJobs(false);
 		
 		// If any of the previous worst jobs aren't in the new worst jobs list, this will return true.
-		Iterator<Job> iterJobs = jobsCurrent.iterator();
+		Iterator iterJobs = jobsCurrent.iterator();
 		while (iterJobs.hasNext()) {
-			Job job = iterJobs.next();
+			Job job = (Job) iterJobs.next();
 			if (!(jobsPrevious.contains(job))) {
 				// We have at least one Job that has moved out of the worst job list, return true.
 				lstReturn.add(job);
@@ -274,9 +274,9 @@ public class Model{
 	
 	public void writeXML(Writer w) throws IOException {
 		w.write("<model>");
-		Iterator<Server> iterServers = servers.iterator();
+		Iterator iterServers = servers.iterator();
 		while (iterServers.hasNext()) {
-			iterServers.next().writeXML(w);
+			((Server) iterServers.next()).writeXML(w);
 		}
 		w.write("</model>");
 	}
@@ -305,9 +305,9 @@ public class Model{
 	 */
 	public int getNumberOfJobsWithColour(String colour) {
 		int iReturn = 0;
-		Iterator<Server> serveriter = servers.iterator();
+		Iterator serveriter = servers.iterator();
 		while (serveriter.hasNext()) {
-			iReturn += serveriter.next().getNumberOfJobsWithColour(colour);
+			iReturn += ((Server) serveriter.next()).getNumberOfJobsWithColour(colour);
 		}
 		return iReturn;
 	}

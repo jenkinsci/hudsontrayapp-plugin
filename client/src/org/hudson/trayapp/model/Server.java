@@ -18,6 +18,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.hudson.trayapp.util.XMLHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,7 +32,7 @@ public class Server extends AbstractTableModel{
 	private String description;
 	private String url;
 	private String name = "";
-	private Map<String, Job> jobs = new HashMap<String, Job>();
+	private Map jobs = new HashMap();
 
 	public Server() {}
 
@@ -46,7 +47,7 @@ public class Server extends AbstractTableModel{
 	private void defaults() {
 		description = "";
 		url = "";
-		jobs = new HashMap<String, Job>();
+		jobs = new HashMap();
 	}
 
 	private static String getRootHudsonURL(String url) {
@@ -85,9 +86,9 @@ public class Server extends AbstractTableModel{
 			 * that we needed. Thus we will have to fetch all the information about each server, job by job.
 			 */
 			if (updated == true && !hudsonBuild173orGreater) {
-				Iterator<Job> iterator = jobs.values().iterator();
+				Iterator iterator = jobs.values().iterator();
 				while (iterator.hasNext()) {
-					iterator.next().update();
+					((Job) iterator.next()).update();
 				}
 			}
 		} catch (ParserConfigurationException e) {
@@ -109,7 +110,7 @@ public class Server extends AbstractTableModel{
 		return url;
 	}
 
-	public Collection<Job> getJobs() {
+	public Collection getJobs() {
 		return jobs.values();
 	}
 
@@ -122,7 +123,7 @@ public class Server extends AbstractTableModel{
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			String name = node.getNodeName();
-			String value = node.getTextContent();
+			String value = XMLHelper.getTextContent(node);
 			if (name.equals("hudson")) {
 				process(node.getChildNodes());
 			} else if (name.equals("listView")) {
@@ -160,11 +161,11 @@ public class Server extends AbstractTableModel{
 	 * The columns will be Colour, Name, URL
 	 */
 	public Object getValueAt(int row, int column) {
-		Iterator<Job> iterJob = getJobs().iterator();
+		Iterator iterJob = getJobs().iterator();
 		Job job = null;
 		int i = 0;
 		while(iterJob.hasNext()) {
-			job = iterJob.next();
+			job = (Job) iterJob.next();
 			if (i == row) {
 				break;
 			} else {
@@ -188,8 +189,7 @@ public class Server extends AbstractTableModel{
 		}
 	}
 
-	@Override
-	public Class<?> getColumnClass(int columnIndex) {
+	public Class getColumnClass(int columnIndex) {
 		switch(columnIndex) {
 		case 0:
 			return String.class;
@@ -225,11 +225,11 @@ public class Server extends AbstractTableModel{
 	 * always return an array, but this array may be empty if there are no jobs defined.
 	 */
 	public Job[] getWorstJobs() {
-		Vector<Job> vecWorst = new Vector<Job>(jobs.size());
+		Vector vecWorst = new Vector(jobs.size());
 		int worstCase = -1;
-		Iterator<Job> jobiter = jobs.values().iterator(); 
+		Iterator jobiter = jobs.values().iterator(); 
 		for (int i = 0; jobiter.hasNext(); i++) {
-			Job job = jobiter.next();
+			Job job = (Job) jobiter.next();
 			String colour = job.getColour();
 			for (int j = 0; worstCase != j && j < Model.colours.length; j++) {
 				if (colour.equals(Model.colours[j])) {
@@ -243,7 +243,7 @@ public class Server extends AbstractTableModel{
 		}
 		Job[] jobaReturn = new Job[vecWorst.size()];
 		for (int i = 0; i < jobaReturn.length; i ++) {
-			jobaReturn[i] = vecWorst.get(i);
+			jobaReturn[i] = (Job) vecWorst.get(i);
 		}
 		return jobaReturn;
 	}
@@ -257,9 +257,9 @@ public class Server extends AbstractTableModel{
 	 */
 	public String getColour() {
 		int worstCase = -1;
-		Iterator<Job> jobiter = jobs.values().iterator(); 
+		Iterator jobiter = jobs.values().iterator(); 
 		for (int i = 0; jobiter.hasNext(); i++) {
-			Job job = jobiter.next();
+			Job job = (Job) jobiter.next();
 			String colour = job.getColour();
 			for (int j = 0; worstCase != j && j < Model.colours.length; j++) {
 				if (colour.equals(Model.colours[j])) {
@@ -282,9 +282,9 @@ public class Server extends AbstractTableModel{
 	 */
 	public int getNumberOfJobsWithColour(String colour) {
 		int iReturn = 0;
-		Iterator<Job> jobiter = jobs.values().iterator(); 
+		Iterator jobiter = jobs.values().iterator(); 
 		while (jobiter.hasNext()) {
-			Job job = jobiter.next();
+			Job job = (Job) jobiter.next();
 			if (job.getColour().equals(colour))
 				iReturn++;
 		}
@@ -337,14 +337,14 @@ public class Server extends AbstractTableModel{
 		 												+ getNumberOfJobsWithColour("blue_anime");
 	}
 
-	public Server clone() {
+	public Object clone() {
 		Server modelReturn = new Server();
 		modelReturn.description = description;
 		modelReturn.url = url;
 		modelReturn.name = name;
-		Iterator<Job> iterator = jobs.values().iterator();
+		Iterator iterator = jobs.values().iterator();
 		while (iterator.hasNext()) {
-			Job job = iterator.next();
+			Job job = (Job) iterator.next();
 			modelReturn.jobs.put(job.getUrl(), job.clone());
 		}
 		return modelReturn;
