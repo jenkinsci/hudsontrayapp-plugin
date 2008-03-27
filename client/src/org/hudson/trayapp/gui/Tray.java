@@ -1,13 +1,9 @@
 package org.hudson.trayapp.gui;
 import java.awt.AWTException;
-import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
-import java.awt.SystemTray;
 import java.awt.Toolkit;
-import java.awt.TrayIcon;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -15,72 +11,53 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+
 import org.hudson.trayapp.HudsonTrayApp;
+import org.hudson.trayapp.gui.icons.Icons;
 import org.hudson.trayapp.gui.tray.AnimatedTrayIcon;
 import org.hudson.trayapp.gui.tray.HudsonTrayIconHelper;
 import org.hudson.trayapp.model.Job;
+import org.jdesktop.jdic.desktop.Desktop;
+import org.jdesktop.jdic.desktop.DesktopException;
+import org.jdesktop.jdic.tray.SystemTray;
+import org.jdesktop.jdic.tray.TrayIcon;
 
 public class Tray {
-	final private SystemTray tray;
-	final private TrayIcon trayIcon;
+	private SystemTray tray;
+	private TrayIcon trayIcon;
 	
 	private AnimatedTrayIcon animatedTrayIcon;
 
 	public Tray() {
-		if (SystemTray.isSupported()) {
-			tray = SystemTray.getSystemTray();
+		try {
+			tray = SystemTray.getDefaultSystemTray();
 			Image image;
 			image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/org/hudson/trayapp/gui/icons/tray/hudson.png"));
-			MouseListener mouseListener = new MouseListener() {
 
-		        public void mouseClicked(MouseEvent e) {
-		            System.out.println("Tray Icon - Mouse clicked!");
-		        }
-
-		        public void mouseEntered(MouseEvent e) {
-		            System.out.println("Tray Icon - Mouse entered!");
-		        }
-
-		        public void mouseExited(MouseEvent e) {
-		            System.out.println("Tray Icon - Mouse exited!");
-		        }
-
-		        public void mousePressed(MouseEvent e) {
-		            System.out.println("Tray Icon - Mouse pressed!");
-		        }
-
-		        public void mouseReleased(MouseEvent e) {
-		            System.out.println("Tray Icon - Mouse released!");
-		        }
-		    };
-
-		    trayIcon = new TrayIcon(image);
+		    trayIcon = new TrayIcon(new ImageIcon(image));
 		    HudsonTrayIconHelper.prepare(trayIcon);
 		    setToolTip("");
-		    rebuildPopupMenu(new Vector<Job>(0));
+		    rebuildPopupMenu(new Vector(0));
 
 		    ActionListener actionListener = new ActionListener() {
 		        public void actionPerformed(ActionEvent e) {
 		        	showMainWindow();
-//		            trayIcon.displayMessage("Action Event",
-//		                "An Action Event Has Been Performed!",
-//		                TrayIcon.MessageType.INFO);
 		        }
 		    };
 
-		    trayIcon.setImageAutoSize(true);
+		    trayIcon.setIconAutoSize(true);
 		    trayIcon.addActionListener(actionListener);
-		    trayIcon.addMouseListener(mouseListener);
-
-		    try {
-		    	tray.add(trayIcon);
-		    } catch (AWTException e) {
-		        System.err.println("TrayIcon could not be added.");
-		    }
-		} else {
+		    tray.addTrayIcon(trayIcon);
+		    
+		} catch (Exception e) {
 			trayIcon = null;
 			tray = null;
 		}
@@ -94,7 +71,7 @@ public class Tray {
 		setAnimatedTrayIcon(HudsonTrayIconHelper.getIcon(Job.convertColour(colour), health));
 	}
 	
-	public void showMessage(String caption, String message, MessageType type) {
+	public void showMessage(String caption, String message, int type) {
 		trayIcon.displayMessage(caption, message, type);
 	}
 	
@@ -102,11 +79,11 @@ public class Tray {
 		trayIcon.setToolTip("Hudson Tray Application\n" + tooltip);
 	}
 	
-	public void rebuildPopupMenu(List<Job> jobs) {
-		PopupMenu popup = new PopupMenu();
+	public void rebuildPopupMenu(List jobs) {
+		JPopupMenu popup = new JPopupMenu();
 		if (jobs.size() > 0) {
 			for (int i = 0; i < jobs.size(); i++) {
-				Job job = jobs.get(i);
+				Job job = (Job) jobs.get(i);
 				ActionListener jobPopupListener = new ActionListener() {
 					private Job jobLink = null;
 					public ActionListener prepare(final Job job) {
@@ -114,16 +91,24 @@ public class Tray {
 						return this;
 					}
 					public void actionPerformed(ActionEvent e) {
-						try{
-							Desktop.getDesktop().browse(new URI(jobLink.getRFC2396CompliantURL()));
-						} catch (URISyntaxException er) {
-							showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + er.getLocalizedMessage(), TrayIcon.MessageType.ERROR);
-						} catch (IOException er) {
-							showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + er.getLocalizedMessage(), TrayIcon.MessageType.ERROR);
-						}
+						new Thread(new Runnable() {
+							public void run() {
+								try{
+									try {
+										Thread.sleep(500);
+									} catch (InterruptedException e){}
+									Desktop.browse(new URL(jobLink.getRFC2396CompliantURL()));
+								} catch (DesktopException er) {
+									showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + er.getLocalizedMessage(), TrayIcon.ERROR_MESSAGE_TYPE);
+								} catch (IOException er) {
+									showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + er.getLocalizedMessage(), TrayIcon.ERROR_MESSAGE_TYPE);
+								}
+							}
+						}, "URL Launching Thread").start();
 					}
 				}.prepare(job);
-				MenuItem jobMenuItem = new MenuItem(job.getName());
+				JMenuItem jobMenuItem = new JMenuItem(job.getName());
+				jobMenuItem.setIcon(getIconFromHealth(job.getWorstHealthScore()));
 				jobMenuItem.addActionListener(jobPopupListener);
 				popup.add(jobMenuItem);
 			}
@@ -133,7 +118,6 @@ public class Tray {
 	    ActionListener exitListener = new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
 	        	HudsonTrayApp.getHudsonTrayAppInstance().write();
-	            System.out.println("Exiting...");
 	            System.exit(0);
 	        }
 	    };
@@ -150,15 +134,15 @@ public class Tray {
 	    	}
 	    };
 
-	    MenuItem openFrameItem = new MenuItem("Open Application");
+	    JMenuItem openFrameItem = new JMenuItem("Open Application");
 	    openFrameItem.addActionListener(openFrameListener);
 	    popup.add(openFrameItem);
 
-	    MenuItem updateItem = new MenuItem("Fetch Update");
+	    JMenuItem updateItem = new JMenuItem("Fetch Update");
 	    updateItem.addActionListener(updatedListener);
 	    popup.add(updateItem);
 
-	    MenuItem defaultItem = new MenuItem("Exit");
+	    JMenuItem defaultItem = new JMenuItem("Exit");
 	    defaultItem.addActionListener(exitListener);
 	    popup.add(defaultItem);
 	    
@@ -171,5 +155,24 @@ public class Tray {
 		}
 		this.animatedTrayIcon = icon;
 		icon.start();
+	}
+	
+	private Icon getIconFromHealth(int health) {
+		if (health == -1) {
+			return null;
+		} else if (health >= 0) {
+			if (health < 20) {
+				return Icons.H0019;
+			} else if (health < 40) {
+				return Icons.H2039;
+			} else if (health < 60) {
+				return Icons.H4059;
+			} else if (health < 80) {
+				return Icons.H6079;
+			} else if (health <= 100) {
+				return Icons.H80PL;
+			}
+		}
+		return null;
 	}
 }
