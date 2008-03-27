@@ -1,6 +1,5 @@
 package org.hudson.trayapp.gui.tray;
 
-import java.awt.TrayIcon;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +51,7 @@ import org.hudson.trayapp.gui.tray.yellow.YellowAnime40to59;
 import org.hudson.trayapp.gui.tray.yellow.YellowAnime60to79;
 import org.hudson.trayapp.gui.tray.yellow.YellowAnime80Plus;
 import org.hudson.trayapp.model.Job;
+import org.jdesktop.jdic.tray.TrayIcon;
 
 public class HudsonTrayIconHelper  {
 
@@ -149,9 +149,9 @@ public class HudsonTrayIconHelper  {
 		}
 	}
 	
-	private static Map<Integer, List<HealthReference>> COLOURSTOICONREFERENCES = new HashMap<Integer, List<HealthReference>>();
+	private static Map COLOURSTOICONREFERENCES = new HashMap();
 	public static void prepare(TrayIcon trayIcon){
-		Vector<HealthReference> vec = new Vector<HealthReference>();
+		Vector vec = new Vector();
 		vec.add(new HealthReference(-1,-1, new Red(trayIcon)));
 		vec.add(new HealthReference(0,20, new Red0to19(trayIcon)));
 		vec.add(new HealthReference(20,40, new Red20to39(trayIcon)));
@@ -159,7 +159,7 @@ public class HudsonTrayIconHelper  {
 		vec.add(new HealthReference(60,80, new Red60to79(trayIcon)));
 		vec.add(new HealthReference(80,101, new Red80Plus(trayIcon)));
 		COLOURSTOICONREFERENCES.put(Job.RED, vec);
-		vec = new Vector<HealthReference>();
+		vec = new Vector();
 		vec.add(new HealthReference(-1,-1, new RedAnime(trayIcon)));
 		vec.add(new HealthReference(0,20, new RedAnime0to19(trayIcon)));
 		vec.add(new HealthReference(20,40, new RedAnime20to39(trayIcon)));
@@ -167,7 +167,7 @@ public class HudsonTrayIconHelper  {
 		vec.add(new HealthReference(60,80, new RedAnime60to79(trayIcon)));
 		vec.add(new HealthReference(80,101, new RedAnime80Plus(trayIcon)));
 		COLOURSTOICONREFERENCES.put(Job.RED_ANIME, vec);
-		vec = new Vector<HealthReference>();
+		vec = new Vector();
 		vec.add(new HealthReference(-1,-1, new Yellow(trayIcon)));
 		vec.add(new HealthReference(0,20, new Yellow0to19(trayIcon)));
 		vec.add(new HealthReference(20,40, new Yellow20to39(trayIcon)));
@@ -175,7 +175,7 @@ public class HudsonTrayIconHelper  {
 		vec.add(new HealthReference(60,80, new Yellow60to79(trayIcon)));
 		vec.add(new HealthReference(80,101, new Yellow80Plus(trayIcon)));
 		COLOURSTOICONREFERENCES.put(Job.YELLOW, vec);
-		vec = new Vector<HealthReference>();
+		vec = new Vector();
 		vec.add(new HealthReference(-1,-1, new YellowAnime(trayIcon)));
 		vec.add(new HealthReference(0,20, new YellowAnime0to19(trayIcon)));
 		vec.add(new HealthReference(20,40, new YellowAnime20to39(trayIcon)));
@@ -183,7 +183,7 @@ public class HudsonTrayIconHelper  {
 		vec.add(new HealthReference(60,80, new YellowAnime60to79(trayIcon)));
 		vec.add(new HealthReference(80,101, new YellowAnime80Plus(trayIcon)));
 		COLOURSTOICONREFERENCES.put(Job.YELLOW_ANIME, vec);
-		vec = new Vector<HealthReference>();
+		vec = new Vector();
 		vec.add(new HealthReference(-1,-1, new Blue(trayIcon)));
 		vec.add(new HealthReference(0,20, new Blue0to19(trayIcon)));
 		vec.add(new HealthReference(20,40, new Blue20to39(trayIcon)));
@@ -191,7 +191,7 @@ public class HudsonTrayIconHelper  {
 		vec.add(new HealthReference(60,80, new Blue60to79(trayIcon)));
 		vec.add(new HealthReference(80,101, new Blue80Plus(trayIcon)));
 		COLOURSTOICONREFERENCES.put(Job.BLUE, vec);
-		vec = new Vector<HealthReference>();
+		vec = new Vector();
 		vec.add(new HealthReference(-1,-1, new BlueAnime(trayIcon)));
 		vec.add(new HealthReference(0,20, new BlueAnime0to19(trayIcon)));
 		vec.add(new HealthReference(20,40, new BlueAnime20to39(trayIcon)));
@@ -199,7 +199,7 @@ public class HudsonTrayIconHelper  {
 		vec.add(new HealthReference(60,80, new BlueAnime60to79(trayIcon)));
 		vec.add(new HealthReference(80,101, new BlueAnime80Plus(trayIcon)));
 		COLOURSTOICONREFERENCES.put(Job.BLUE_ANIME, vec);
-		vec = new Vector<HealthReference>();
+		vec = new Vector();
 		vec.add(new HealthReference(-1,-1, new Grey(trayIcon)));
 		vec.add(new HealthReference(0,20, new Grey0to19(trayIcon)));
 		vec.add(new HealthReference(20,40, new Grey20to39(trayIcon)));
@@ -207,7 +207,7 @@ public class HudsonTrayIconHelper  {
 		vec.add(new HealthReference(60,80, new Grey60to79(trayIcon)));
 		vec.add(new HealthReference(80,101, new Grey80Plus(trayIcon)));
 		COLOURSTOICONREFERENCES.put(Job.GREY, vec);
-//		vec = new Vector<HealthReference>();
+//		vec = new Vector();
 //		vec.add(new HealthReference(-1,-1, new GreyAnime(trayIcon)));
 //		vec.add(new HealthReference(0,20, new GreyAnime0to19(trayIcon)));
 //		vec.add(new HealthReference(20,40, new GreyAnime20to39(trayIcon)));
@@ -219,15 +219,15 @@ public class HudsonTrayIconHelper  {
 	
 	public static AnimatedTrayIcon getIcon(Integer colour, int health) {
 		AnimatedTrayIcon icon = null;
-		List<HealthReference> refs = COLOURSTOICONREFERENCES.get(colour);
+		List refs = (List) COLOURSTOICONREFERENCES.get(colour);
 		if (refs != null) {
 			int i = 0;
 			for (; icon == null && i < refs.size(); i++) {
-				icon = refs.get(i).fits(health);
+				icon = ((HealthReference) refs.get(i)).fits(health);
 			}
 			if (i == refs.size() && refs.size() > 0) {
 				for (i = 0; icon == null && i < refs.size(); i++) {
-					icon = refs.get(i).fits(-1);
+					icon = ((HealthReference) refs.get(i)).fits(-1);
 				}
 			}
 		}

@@ -3,13 +3,15 @@ package org.hudson.trayapp.gui.tray;
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
+import javax.swing.ImageIcon;
 import javax.swing.Timer;
+
+import org.jdesktop.jdic.tray.TrayIcon;
 
 
 public class AnimatedTrayIcon {
@@ -31,7 +33,7 @@ public class AnimatedTrayIcon {
 			public void actionPerformed(ActionEvent e) {
 				ImageAndDelay iad = AnimatedTrayIcon.this.imageAndDelays[frame];
 				int length = AnimatedTrayIcon.this.imageAndDelays.length;
-				AnimatedTrayIcon.this.trayIcon.setImage(iad.image.getImage());
+				AnimatedTrayIcon.this.trayIcon.setIcon(iad.image.imageIcon);
 				frame++;
 				if (frame == length) {
 					frame = 0;
@@ -39,6 +41,8 @@ public class AnimatedTrayIcon {
 				if (length != 1) {
 					timer.setDelay(iad.delay);
 					timer.restart();
+				} else {
+					timer.stop();
 				}
 			}
 			
@@ -64,21 +68,22 @@ public class AnimatedTrayIcon {
 	}
 	
 	public static class LayeredImage {
-		private BufferedImage image = null;
+		private ImageIcon imageIcon = null;
 		
 		public LayeredImage(BufferedImage[] images, float[] alpha) {
 			if (images != null && images.length > 0 && alpha != null && alpha.length > 0 && alpha.length == images.length) {
-				image = new BufferedImage(images[0].getWidth(), images[0].getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				BufferedImage image = new BufferedImage(images[0].getWidth(), images[0].getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 				Graphics2D g = (Graphics2D) image.getGraphics();
 				for (int i = 0; i < images.length; i++) {
 					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha[i]));
 					g.drawRenderedImage(images[i], new AffineTransform());
 				}
+				imageIcon = new ImageIcon(image);
 			}
 		}
 		
-		public Image getImage() {
-			return image;
+		public ImageIcon getImageIcon() {
+			return imageIcon;
 		}
 	}
 }

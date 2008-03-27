@@ -1,10 +1,8 @@
 package org.hudson.trayapp.gui.tray.grey;
 
-import java.awt.TrayIcon;
-
-import org.hudson.trayapp.gui.tray.HudsonTrayIconHelper;
 import org.hudson.trayapp.gui.tray.Images;
 import org.hudson.trayapp.gui.tray.HudsonTrayIconHelper.StaticImage;
+import org.jdesktop.jdic.tray.TrayIcon;
 
 public class Grey60to79 extends StaticImage{
 
