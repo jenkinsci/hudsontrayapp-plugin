@@ -3,7 +3,7 @@
 	
 	<path id="project.classpath">
 		<pathelement location="lib/junit-4.4.jar"/>
-		<pathelement location="lib/jdic-0.9.4-bin-cross-platform/jdic.jar"/>
+		<pathelement location="lib/jdic-0.9.1-bin-cross-platform/jdic.jar"/>
 	</path>
 	
 	<target name="completecycle" depends="clean,build,jar,signjar"/>
@@ -44,14 +44,14 @@
 		<mkdir dir="dist/sun" />
 		<mkdir dir="dist/sun/x86" />
 		<mkdir dir="dist/sun/sparc" />
-		<jar destfile="dist/win/x86/jdic-native.jar" basedir="lib/jdic-0.9.4-bin-cross-platform/windows/x86"/>
-		<jar destfile="dist/lin/x86/jdic-native.jar" basedir="lib/jdic-0.9.4-bin-cross-platform/linux/x86"/>
-		<jar destfile="dist/sun/x86/jdic-native.jar" basedir="lib/jdic-0.9.4-bin-cross-platform/sunos/x86"/>
-		<jar destfile="dist/sun/sparc/jdic-native.jar" basedir="lib/jdic-0.9.4-bin-cross-platform/sunos/sparc"/>
-		<copy file="lib/jdic-0.9.4-bin-cross-platform/jdic.jar" todir="dist" />
-		<copy file="lib/jdic-0.9.4-bin-cross-platform/windows/jdic_stub.jar" todir="dist/win" />
-		<copy file="lib/jdic-0.9.4-bin-cross-platform/linux/jdic_stub.jar" todir="dist/lin" />
-		<copy file="lib/jdic-0.9.4-bin-cross-platform/sunos/jdic_stub.jar" todir="dist/sun" />
+		<jar destfile="dist/win/x86/jdic-native.jar" basedir="lib/jdic-0.9.1-bin-cross-platform/windows/x86"/>
+		<jar destfile="dist/lin/x86/jdic-native.jar" basedir="lib/jdic-0.9.1-bin-cross-platform/linux/x86"/>
+		<jar destfile="dist/sun/x86/jdic-native.jar" basedir="lib/jdic-0.9.1-bin-cross-platform/sunos/x86"/>
+		<jar destfile="dist/sun/sparc/jdic-native.jar" basedir="lib/jdic-0.9.1-bin-cross-platform/sunos/sparc"/>
+		<copy file="lib/jdic-0.9.1-bin-cross-platform/jdic.jar" todir="dist" />
+		<copy file="lib/jdic-0.9.1-bin-cross-platform/windows/jdic_stub.jar" todir="dist/win" />
+		<copy file="lib/jdic-0.9.1-bin-cross-platform/linux/jdic_stub.jar" todir="dist/lin" />
+		<copy file="lib/jdic-0.9.1-bin-cross-platform/sunos/jdic_stub.jar" todir="dist/sun" />
 	</target>
 	
 	<target name="signjar">
