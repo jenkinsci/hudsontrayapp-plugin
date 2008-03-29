@@ -568,7 +568,7 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 		resultsOverallLabel.setIcon(new ImageIcon(getClass().getResource("/org/hudson/trayapp/gui/icons/48x48/" + colour +".gif")));
 	}
 
-	public void updateResults(TableModel tableModel) {
+	public void setTableModel(ServerTableModel tableModel) {
 
 		resultsTable.setModel(tableModel);
 		TableColumn colourColumn = resultsTable.getColumnModel().getColumn(0);
@@ -593,9 +593,37 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 		});
 		colourColumn.setResizable(false);
 		colourColumn.setPreferredWidth(20);
-		int width = getWidth() - 40;
-		resultsTable.getColumnModel().getColumn(1).setPreferredWidth((width - colourColumn.getPreferredWidth()) / 2 );
-		resultsTable.getColumnModel().getColumn(2).setPreferredWidth((width - colourColumn.getPreferredWidth()) / 2 );
+		if (tableModel.getColumnCount() == 4) {
+			TableColumn healthColumn = resultsTable.getColumnModel().getColumn(1);
+			healthColumn.setCellRenderer(new DefaultTableCellRenderer() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
+				public Component getTableCellRendererComponent(JTable table,
+						Object value, boolean isSelected, boolean hasFocus, int row,
+						int column) {
+
+					super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+					ImageIcon icon = (ImageIcon) Tray.getIconFromHealth(((Integer) value).intValue());
+					setIcon(icon);
+					icon.setImageObserver(new CellImageObserver(resultsTable, row, column));
+					setText("");
+					setIgnoreRepaint(false);
+					return this;
+				}
+			});
+			healthColumn.setResizable(false);
+			healthColumn.setPreferredWidth(20);
+			int width = getWidth() - 40;
+			resultsTable.getColumnModel().getColumn(2).setPreferredWidth((width - colourColumn.getPreferredWidth() - healthColumn.getPreferredWidth()) / 2 );
+			resultsTable.getColumnModel().getColumn(3).setPreferredWidth((width - colourColumn.getPreferredWidth() - healthColumn.getPreferredWidth()) / 2 );
+		} else if (tableModel.getColumnCount() == 3) {
+			int width = getWidth() - 40;
+			resultsTable.getColumnModel().getColumn(1).setPreferredWidth((width - colourColumn.getPreferredWidth()) / 2 );
+			resultsTable.getColumnModel().getColumn(2).setPreferredWidth((width - colourColumn.getPreferredWidth()) / 2 );
+		}
 	}
 
 	/**
@@ -1524,7 +1552,14 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 	public void updateResults() {
 		if (model.getServerModelSize() > 0) {
 			Server server = model.getServerAt(0);
-			updateResults(server);
+			ServerTableModel stm = null;
+			try {
+				stm = (ServerTableModel) resultsTable.getModel();
+				stm.setServer(server);
+			} catch (ClassCastException e) {
+				stm = new ServerTableModel(server);
+			}
+			setTableModel(stm);
 			getDescriptionEditorPane().setText(server.getDescription());
 			String colour = model.getWorstColour(false);
 			int red = model.getNumberOfRedJobs();
