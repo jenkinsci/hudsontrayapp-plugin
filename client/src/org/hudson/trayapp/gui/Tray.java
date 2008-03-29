@@ -159,7 +159,7 @@ public class Tray {
 		icon.start();
 	}
 	
-	private Icon getIconFromHealth(int health) {
+	public static Icon getIconFromHealth(int health) {
 		if (health == -1) {
 			return null;
 		} else if (health >= 0) {
