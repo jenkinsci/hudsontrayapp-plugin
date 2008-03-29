@@ -23,6 +23,10 @@
 			<src path="src"/>
 			<classpath refid="project.classpath"/>
 		</javac>
+		<javac destdir="bin" debug="true" source="1.6" target="1.6">
+			<src path="srcjava6"/>
+			<classpath refid="project.classpath"/>
+		</javac>
 	</target>
 	
 	<target name="jar">
