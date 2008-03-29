@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -24,26 +25,31 @@ import org.hudson.trayapp.HudsonTrayApp;
 import org.hudson.trayapp.gui.icons.Icons;
 import org.hudson.trayapp.gui.tray.AnimatedTrayIcon;
 import org.hudson.trayapp.gui.tray.HudsonTrayIconHelper;
+import org.hudson.trayapp.gui.tray.TrayIconImplementation;
+import org.hudson.trayapp.gui.tray.JDICTrayIcon;
 import org.hudson.trayapp.model.Job;
-import org.jdesktop.jdic.desktop.Desktop;
-import org.jdesktop.jdic.desktop.DesktopException;
-import org.jdesktop.jdic.tray.SystemTray;
-import org.jdesktop.jdic.tray.TrayIcon;
 
 public class Tray {
-	private SystemTray tray;
-	private TrayIcon trayIcon;
+	private TrayIconImplementation trayIcon;
 	
 	private AnimatedTrayIcon animatedTrayIcon;
 
 	public Tray() {
 		try {
-			tray = SystemTray.getDefaultSystemTray();
-			Image image;
-			image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/org/hudson/trayapp/gui/icons/tray/hudson.png"));
-
-		    trayIcon = new TrayIcon(new ImageIcon(image));
-		    HudsonTrayIconHelper.prepare(trayIcon);
+			ImageIcon icon = new ImageIcon((Toolkit.getDefaultToolkit().getImage(getClass().getResource("/org/hudson/trayapp/gui/icons/tray/hudson.png"))));
+			float version = Float.parseFloat(System.getProperty("java.specification.version"));
+			if (version >= 1.6) {
+				/*
+				 * We need to use the following hack to ensure that Tray doesn't try to instantiate the AWTTrayIcon
+				 * class if we're running under Java 1.4-1.5.
+				 */
+				Class cl = Class.forName("org.hudson.trayapp.gui.tray.AWTTrayIcon");
+				Constructor cons = cl.getConstructor(new Class[] {ImageIcon.class});
+				trayIcon = (TrayIconImplementation) cons.newInstance(new Object[] {icon});
+			} else {
+				trayIcon = new JDICTrayIcon(icon);
+			}
+			HudsonTrayIconHelper.prepare(trayIcon);
 		    setToolTip("");
 		    rebuildPopupMenu(new Vector(0));
 
@@ -55,11 +61,9 @@ public class Tray {
 
 		    trayIcon.setIconAutoSize(true);
 		    trayIcon.addActionListener(actionListener);
-		    tray.addTrayIcon(trayIcon);
 		    
 		} catch (Exception e) {
 			trayIcon = null;
-			tray = null;
 		}
 	}
 
@@ -97,11 +101,9 @@ public class Tray {
 									try {
 										Thread.sleep(500);
 									} catch (InterruptedException e){}
-									Desktop.browse(new URL(jobLink.getRFC2396CompliantURL()));
-								} catch (DesktopException er) {
-									showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + er.getLocalizedMessage(), TrayIcon.ERROR_MESSAGE_TYPE);
-								} catch (IOException er) {
-									showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + er.getLocalizedMessage(), TrayIcon.ERROR_MESSAGE_TYPE);
+									trayIcon.browse(new URL(jobLink.getRFC2396CompliantURL()).toURI());
+								} catch (Exception e) {
+									showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + e.getLocalizedMessage(), TrayIconImplementation.ERROR_MESSAGE_TYPE);
 								}
 							}
 						}, "URL Launching Thread").start();
@@ -174,5 +176,9 @@ public class Tray {
 			}
 		}
 		return null;
+	}
+	
+	public void browse(URL url) throws Exception {
+		trayIcon.browse(url.toURI());
 	}
 }
