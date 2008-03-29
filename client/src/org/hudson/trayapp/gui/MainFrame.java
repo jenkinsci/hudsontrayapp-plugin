@@ -54,9 +54,7 @@ import org.hudson.trayapp.model.Job;
 import org.hudson.trayapp.model.Model;
 import org.hudson.trayapp.model.Preferences;
 import org.hudson.trayapp.model.Server;
-import org.jdesktop.jdic.desktop.Desktop;
-import org.jdesktop.jdic.desktop.DesktopException;
-import org.jdesktop.jdic.tray.TrayIcon;
+import org.hudson.trayapp.gui.tray.TrayIconImplementation;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.JCheckBox;
@@ -559,9 +557,9 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 	    if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 	    	System.out.println(event.getURL().toString());
 	    	try {
-	    		Desktop.browse(event.getURL());
-	    	} catch(DesktopException de) {
-	    		HudsonTrayApp.getHudsonTrayAppInstance().getTray().showMessage("Error launching Browser", "Couldn't launch the url:\n"+event.getURL().toString(), TrayIcon.ERROR_MESSAGE_TYPE);
+	    		HudsonTrayApp.getHudsonTrayAppInstance().getTray().browse(event.getURL());
+	    	} catch(Exception e) {
+	    		HudsonTrayApp.getHudsonTrayAppInstance().getTray().showMessage("Error launching Browser", "Couldn't launch the url:\n"+event.getURL().toString(), TrayIconImplementation.ERROR_MESSAGE_TYPE);
 	    	}
 	    }
 	}

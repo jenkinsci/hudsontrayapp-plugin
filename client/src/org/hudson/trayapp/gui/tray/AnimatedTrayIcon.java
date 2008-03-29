@@ -11,8 +11,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
-import org.jdesktop.jdic.tray.TrayIcon;
-
 
 public class AnimatedTrayIcon {
 	
@@ -20,11 +18,11 @@ public class AnimatedTrayIcon {
 	
 	private int frame;
 	
-	private TrayIcon trayIcon;
+	private TrayIconImplementation trayIcon;
 	
 	private Timer timer;
 	
-	public AnimatedTrayIcon(ImageAndDelay[] imageAndDelays, TrayIcon trayIcon) {
+	public AnimatedTrayIcon(ImageAndDelay[] imageAndDelays, TrayIconImplementation trayIcon) {
 		this.imageAndDelays = imageAndDelays;
 		frame = imageAndDelays.length != 0 ? 0 : -1;
 		this.trayIcon = trayIcon;

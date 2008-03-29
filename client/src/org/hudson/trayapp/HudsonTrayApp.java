@@ -16,10 +16,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.hudson.trayapp.actions.Action;
 import org.hudson.trayapp.gui.MainFrame;
 import org.hudson.trayapp.gui.Tray;
+import org.hudson.trayapp.gui.tray.TrayIconImplementation;
 import org.hudson.trayapp.model.Job;
 import org.hudson.trayapp.model.Model;
 import org.hudson.trayapp.model.Preferences;
-import org.jdesktop.jdic.tray.TrayIcon;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -129,28 +129,28 @@ public class HudsonTrayApp {
 		if (prefs.isShowPopupNotifications()) {
 			if (colourPrevious.intValue() > colourCurrent.intValue()) {
 				//List<Job> 
-				tray.showMessage("Build Worsening", "The overall build status has degraded from\n"+Job.getColour(colourPrevious) + " to " + Job.getColour(colourCurrent), TrayIcon.ERROR_MESSAGE_TYPE);
+				tray.showMessage("Build Worsening", "The overall build status has degraded from\n"+Job.getColour(colourPrevious) + " to " + Job.getColour(colourCurrent), TrayIconImplementation.ERROR_MESSAGE_TYPE);
 			} else if (colourPrevious.intValue() < colourCurrent.intValue()) {
-				tray.showMessage("Build Improving", "The overall build status has improved from\n"+Job.getColour(colourPrevious) + " to " + Job.getColour(colourCurrent), TrayIcon.INFO_MESSAGE_TYPE);
+				tray.showMessage("Build Improving", "The overall build status has improved from\n"+Job.getColour(colourPrevious) + " to " + Job.getColour(colourCurrent), TrayIconImplementation.INFO_MESSAGE_TYPE);
 			} else if (bldChgd && colourCurrent.intValue() < Job.BLUE.intValue()) {
 				List lstLeftJobs = model.getJobsLeftWorstBuild();
 				List lstJoinedJobs = model.getJobsJoinedWorstBuild();
 				if (lstLeftJobs.isEmpty() && lstJoinedJobs.isEmpty()) {
-					tray.showMessage("Build No Improvement", "The overall build has changed, but this has neither made an improvement or degredation.", TrayIcon.INFO_MESSAGE_TYPE);
+					tray.showMessage("Build No Improvement", "The overall build has changed, but this has neither made an improvement or degredation.", TrayIconImplementation.INFO_MESSAGE_TYPE);
 				} else if (lstLeftJobs.isEmpty()) {
 					// We haven't had any jobs leave which means that some have joined our status.
 					sb = new StringBuffer();
 					for (int i = 0; i < lstJoinedJobs.size(); i++) {
 						sb.append("\n"+((Job) lstJoinedJobs.get(i)).getName());
 					}
-					tray.showMessage("Jobs have Joined Worst Colour", "The overall build worst colour hasn't changed, but the following projects have worsened, and joined this colour:" + sb.toString(), TrayIcon.ERROR_MESSAGE_TYPE);
+					tray.showMessage("Jobs have Joined Worst Colour", "The overall build worst colour hasn't changed, but the following projects have worsened, and joined this colour:" + sb.toString(), TrayIconImplementation.ERROR_MESSAGE_TYPE);
 				} else if (lstJoinedJobs.isEmpty()) {
 					// We haven't had any jobs join which means that some have left our status.
 					sb = new StringBuffer();
 					for (int i = 0; i < lstLeftJobs.size(); i++) {
 						sb.append("\n"+((Job) lstLeftJobs.get(i)).getName());
 					}
-					tray.showMessage("Jobs have left Worst Colour", "The overall build worst colour hasn't changed, but the following projects have improved away from this colour:" + sb.toString(), TrayIcon.INFO_MESSAGE_TYPE);
+					tray.showMessage("Jobs have left Worst Colour", "The overall build worst colour hasn't changed, but the following projects have improved away from this colour:" + sb.toString(), TrayIconImplementation.INFO_MESSAGE_TYPE);
 				} else {
 					// We had jobs join and leave our status.
 					StringBuffer sbleft = new StringBuffer();
@@ -161,7 +161,7 @@ public class HudsonTrayApp {
 					for (int i = 0; i < lstJoinedJobs.size(); i++) {
 						sbjoin.append("\n"+((Job) lstJoinedJobs.get(i)).getName());
 					}
-					tray.showMessage("Jobs have joined and left Worst Colour", "The overall build worst colour hasn't changed, but the following projects have worsened, and joined this colour:" + sbjoin.toString() + "\nThe following projects have improved away from this colour:" + sbleft.toString(), TrayIcon.INFO_MESSAGE_TYPE);
+					tray.showMessage("Jobs have joined and left Worst Colour", "The overall build worst colour hasn't changed, but the following projects have worsened, and joined this colour:" + sbjoin.toString() + "\nThe following projects have improved away from this colour:" + sbleft.toString(), TrayIconImplementation.INFO_MESSAGE_TYPE);
 				}
 			}
 		}

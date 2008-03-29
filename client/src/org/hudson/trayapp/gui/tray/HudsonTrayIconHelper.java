@@ -51,7 +51,6 @@ import org.hudson.trayapp.gui.tray.yellow.YellowAnime40to59;
 import org.hudson.trayapp.gui.tray.yellow.YellowAnime60to79;
 import org.hudson.trayapp.gui.tray.yellow.YellowAnime80Plus;
 import org.hudson.trayapp.model.Job;
-import org.jdesktop.jdic.tray.TrayIcon;
 
 public class HudsonTrayIconHelper  {
 
@@ -74,7 +73,7 @@ public class HudsonTrayIconHelper  {
 	}
 	
 	public static class StaticImage extends AnimatedTrayIcon {
-		public StaticImage(BufferedImage colourImage, BufferedImage healthImage, TrayIcon trayIcon) {
+		public StaticImage(BufferedImage colourImage, BufferedImage healthImage, TrayIconImplementation trayIcon) {
 			super(new ImageAndDelay[]{
 					new ImageAndDelay(new LayeredImage(new BufferedImage[] {
 						Images.HUDSON, Images.COLOURRING, colourImage, healthImage
@@ -84,7 +83,7 @@ public class HudsonTrayIconHelper  {
 				}, trayIcon);
 		}
 		
-		public StaticImage(BufferedImage colourImage, TrayIcon trayIcon) {
+		public StaticImage(BufferedImage colourImage, TrayIconImplementation trayIcon) {
 			super(new ImageAndDelay[]{
 					new ImageAndDelay(new LayeredImage(new BufferedImage[] {
 						Images.HUDSON, Images.COLOURRING, colourImage
@@ -96,7 +95,7 @@ public class HudsonTrayIconHelper  {
 	}
 	
 	public static class AnimatedImage extends AnimatedTrayIcon {
-		public AnimatedImage(BufferedImage colourImage, BufferedImage healthImage, TrayIcon trayIcon) {
+		public AnimatedImage(BufferedImage colourImage, BufferedImage healthImage, TrayIconImplementation trayIcon) {
 			super(new ImageAndDelay[]{
 					new HelperImageAndDelay(colourImage, 0.0f, healthImage, 100),
 					new HelperImageAndDelay(colourImage, 0.2f, healthImage, 100),
@@ -111,7 +110,7 @@ public class HudsonTrayIconHelper  {
 				}, trayIcon);
 		}
 		
-		public AnimatedImage(BufferedImage colourImage, TrayIcon trayIcon) {
+		public AnimatedImage(BufferedImage colourImage, TrayIconImplementation trayIcon) {
 			super(new ImageAndDelay[]{
 					new HelperImageAndDelay(colourImage, 0.0f, 100),
 					new HelperImageAndDelay(colourImage, 0.2f, 100),
@@ -150,7 +149,7 @@ public class HudsonTrayIconHelper  {
 	}
 	
 	private static Map COLOURSTOICONREFERENCES = new HashMap();
-	public static void prepare(TrayIcon trayIcon){
+	public static void prepare(TrayIconImplementation trayIcon){
 		Vector vec = new Vector();
 		vec.add(new HealthReference(-1,-1, new Red(trayIcon)));
 		vec.add(new HealthReference(0,20, new Red0to19(trayIcon)));
