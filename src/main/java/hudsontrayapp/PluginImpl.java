@@ -37,9 +37,18 @@ public class PluginImpl extends Plugin {
 		w.write("</information>");
         w.write("<security><all-permissions/></security>");
         w.write("<resources>");
-        w.write("<j2se version=\"1.4+\" initial-heap-size=\"32m\" max-heap-size=\"32m\"/>");
         w.write("<jar href=\"HudsonTrayApp.jar\" main=\"true\" download=\"eager\"/>");
+        w.write("<j2se version=\"1.6+\" initial-heap-size=\"32m\" max-heap-size=\"32m\"/>");
+        w.write("<j2se version=\"1.5\" initial-heap-size=\"32m\" max-heap-size=\"32m\">");
+        w.write("<resources>");
         w.write("<extension name=\"jdic\" href=\"jdic\"/>");
+        w.write("</resources>");
+        w.write("</j2se>");
+        w.write("<j2se version=\"1.4\" initial-heap-size=\"32m\" max-heap-size=\"32m\">");
+        w.write("<resources>");
+        w.write("<extension name=\"jdic\" href=\"jdic\"/>");
+        w.write("</resources>");
+        w.write("</j2se>");
         w.write("</resources>");
         w.write("<application-desc main-class=\"org.hudson.trayapp.HudsonTrayApp\">");
         w.write("<argument>server="); w.write(req.getRootPath()); w.write("/</argument>"); 
@@ -83,5 +92,6 @@ public class PluginImpl extends Plugin {
 		w.write("</resources>");
 		w.write("<component-desc/>");
 		w.write("</jnlp>");
+		w.close();
 	}
 }
