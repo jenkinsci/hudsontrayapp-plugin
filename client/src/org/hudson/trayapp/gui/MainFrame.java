@@ -1,5 +1,7 @@
 package org.hudson.trayapp.gui;
 
+import com.sun.swing.TableSorter;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -569,8 +571,11 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 	}
 
 	public void setTableModel(ServerTableModel tableModel) {
+		
+		TableSorter sortedModel = new TableSorter(tableModel);
+		resultsTable.setModel(sortedModel);
+		sortedModel.addMouseListenerToHeaderInTable(resultsTable);
 
-		resultsTable.setModel(tableModel);
 		TableColumn colourColumn = resultsTable.getColumnModel().getColumn(0);
 		colourColumn.setCellRenderer(new DefaultTableCellRenderer() {
 			/**
