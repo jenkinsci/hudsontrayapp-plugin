@@ -8,12 +8,12 @@ import java.net.URLConnection;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.table.AbstractTableModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,14 +25,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class Server extends AbstractTableModel{
+public class Server {
 
 	private static final long serialVersionUID = 1L;
 
 	private String description;
 	private String url;
 	private String name = "";
-	private Map jobs = new HashMap();
+	private List jobs = new Vector();
+	
+	private transient boolean bVersion173OrGreater = false;
 
 	public Server() {}
 
@@ -47,7 +49,7 @@ public class Server extends AbstractTableModel{
 	private void defaults() {
 		description = "";
 		url = "";
-		jobs = new HashMap();
+		jobs = new Vector();
 	}
 
 	private static String getRootHudsonURL(String url) {
@@ -66,7 +68,7 @@ public class Server extends AbstractTableModel{
 	public boolean update() {
 		boolean updated = false;
 		try {
-			boolean hudsonBuild173orGreater = isHudsonBuild173orGreater();
+			boolean hudsonBuild173orGreater = isHudsonBuild173orGreater(true);
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			URL urlo;
@@ -86,7 +88,7 @@ public class Server extends AbstractTableModel{
 			 * that we needed. Thus we will have to fetch all the information about each server, job by job.
 			 */
 			if (updated == true && !hudsonBuild173orGreater) {
-				Iterator iterator = jobs.values().iterator();
+				Iterator iterator = jobs.iterator();
 				while (iterator.hasNext()) {
 					((Job) iterator.next()).update();
 				}
@@ -111,7 +113,7 @@ public class Server extends AbstractTableModel{
 	}
 
 	public Collection getJobs() {
-		return jobs.values();
+		return jobs;
 	}
 
 	public String getName() {
@@ -134,87 +136,10 @@ public class Server extends AbstractTableModel{
 				url = value;
 			} else if (name.equals("job")) {
 				Job job = Job.process(node);
-				jobs.put(job.getUrl(), job);
+				jobs.add(job);
 			} else if (name.equals("internalname")) {
 				this.name = value;
 			}
-		}
-	}
-
-	/**
-	 * The columns will be Colour, Name, URL
-	 * @return
-	 */
-	public int getColumnCount() {
-		return 3;
-	}
-
-	/**
-	 * The total number of jobs
-	 * @return
-	 */
-	public int getRowCount() {
-		return jobs.size();
-	}
-
-	/**
-	 * The columns will be Colour, Name, URL
-	 */
-	public Object getValueAt(int row, int column) {
-		Iterator iterJob = getJobs().iterator();
-		Job job = null;
-		int i = 0;
-		while(iterJob.hasNext()) {
-			job = (Job) iterJob.next();
-			if (i == row) {
-				break;
-			} else {
-				job = null;
-			}
-			i++;
-		}
-		// The job will be null always, except where we have found the correct row
-		if (job == null)
-			return null;
-		
-		switch(column) {
-		case 0:
-			return job.getColour();
-		case 1:
-			return job.getName();
-		case 2:
-			return job.getUrl();
-		default:
-			return null;
-		}
-	}
-
-	public Class getColumnClass(int columnIndex) {
-		switch(columnIndex) {
-		case 0:
-			return String.class;
-		case 1:
-			return String.class;
-		case 2:
-			return String.class;
-		default:
-			return String.class;
-		}
-	}
-
-	/**
-	 * The columns will be Colour, Name, URL
-	 */
-	public String getColumnName(int column) {
-		switch(column) {
-		case 0:
-			return "";
-		case 1:
-			return "Name";
-		case 2:
-			return "URL";
-		default:
-			return null;
 		}
 	}
 	
@@ -227,7 +152,7 @@ public class Server extends AbstractTableModel{
 	public Job[] getWorstJobs() {
 		Vector vecWorst = new Vector(jobs.size());
 		int worstCase = -1;
-		Iterator jobiter = jobs.values().iterator(); 
+		Iterator jobiter = jobs.iterator(); 
 		for (int i = 0; jobiter.hasNext(); i++) {
 			Job job = (Job) jobiter.next();
 			String colour = job.getColour();
@@ -257,7 +182,7 @@ public class Server extends AbstractTableModel{
 	 */
 	public String getColour() {
 		int worstCase = -1;
-		Iterator jobiter = jobs.values().iterator(); 
+		Iterator jobiter = jobs.iterator(); 
 		for (int i = 0; jobiter.hasNext(); i++) {
 			Job job = (Job) jobiter.next();
 			String colour = job.getColour();
@@ -282,7 +207,7 @@ public class Server extends AbstractTableModel{
 	 */
 	public int getNumberOfJobsWithColour(String colour) {
 		int iReturn = 0;
-		Iterator jobiter = jobs.values().iterator(); 
+		Iterator jobiter = jobs.iterator(); 
 		while (jobiter.hasNext()) {
 			Job job = (Job) jobiter.next();
 			if (job.getColour().equals(colour))
@@ -342,10 +267,10 @@ public class Server extends AbstractTableModel{
 		modelReturn.description = description;
 		modelReturn.url = url;
 		modelReturn.name = name;
-		Iterator iterator = jobs.values().iterator();
+		Iterator iterator = jobs.iterator();
 		while (iterator.hasNext()) {
 			Job job = (Job) iterator.next();
-			modelReturn.jobs.put(job.getUrl(), job.clone());
+			modelReturn.jobs.add(job.clone());
 		}
 		return modelReturn;
 	}
@@ -357,26 +282,35 @@ public class Server extends AbstractTableModel{
 	 *
 	 * @return Returns true if the build of Hudson this URL points to is of version 173 or greater. Returns false otherwise.
 	 */
-	public boolean isHudsonBuild173orGreater() {
+	public boolean isHudsonBuild173orGreater() { return isHudsonBuild173orGreater(false); }
+	private boolean isHudsonBuild173orGreater(boolean fetchFromServer) {
 
-		URL urlo = null;
-		try {
-			 urlo = new URL(getRootHudsonURL(url));
-			 URLConnection conn = urlo.openConnection();
-			 String version = conn.getHeaderField("X-Hudson") + " ";
-			 Matcher matcher = null;
-			 if (version != null)
-				 matcher = pattern.matcher(version);
-			 if (matcher != null && matcher.matches() && matcher.groupCount() >= 1) {
-				 float f = Float.parseFloat(matcher.group(1));
-				 return f > 1.172;
-			 } else {
-				 return false;
-			 }
-		} catch (MalformedURLException e) {
-		} catch (IOException e) {
+		if (fetchFromServer) {
+			URL urlo = null;
+			try {
+				 urlo = new URL(getRootHudsonURL(url));
+				 URLConnection conn = urlo.openConnection();
+				 String version = conn.getHeaderField("X-Hudson") + " ";
+				 Matcher matcher = null;
+				 if (version != null)
+					 matcher = pattern.matcher(version);
+				 if (matcher != null && matcher.matches() && matcher.groupCount() >= 1) {
+					 float f = Float.parseFloat(matcher.group(1));
+					 bVersion173OrGreater = f > 1.172;
+					 return bVersion173OrGreater;
+				 } else {
+					 bVersion173OrGreater = false;
+					 return bVersion173OrGreater;
+				 }
+			} catch (MalformedURLException e) {
+			} catch (IOException e) {
+			}
+			bVersion173OrGreater = false;
+			return false;
 		}
-		return false;
+		else {
+			return bVersion173OrGreater;
+		}
 	}
 
 	private static Pattern pattern = Pattern.compile("([0-9.]*).*");
@@ -394,5 +328,9 @@ public class Server extends AbstractTableModel{
 		w.write("<internalname>"); w.write(name); w.write("</internalname>");
 		w.write("<url>"); w.write(url); w.write("</url>");
 		w.write("</server>");
+	}
+	
+	public boolean isHealthSupported() {
+		return isHudsonBuild173orGreater();
 	}
 }
