@@ -23,6 +23,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -607,6 +608,7 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 		});
 		colourColumn.setResizable(false);
 		colourColumn.setPreferredWidth(20);
+		
 		if (tableModel.getColumnCount() == 4) {
 			TableColumn healthColumn = resultsTable.getColumnModel().getColumn(1);
 			healthColumn.setCellRenderer(new DefaultTableCellRenderer() {
@@ -930,6 +932,28 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 		if (resultsTable == null) {
 			resultsTable = new JTable();
 			resultsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+			resultsTable.addMouseListener(new MouseListener() {
+				public void mouseClicked(MouseEvent e) {
+					int column = resultsTable.columnAtPoint(e.getPoint());
+					if (e.getClickCount() == 2) {
+						int row = resultsTable.rowAtPoint(e.getPoint());
+						try {
+							String value = resultsTable.getValueAt(row, column).toString();
+							if (value.indexOf("http://") != -1 || value.indexOf("https://") != -1) {
+								HudsonTrayApp.getHudsonTrayAppInstance().getTray().browse(new URL(Job.getRFC2396CompliantURL(value)));
+							}
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+				}
+				
+				public void mouseEntered(MouseEvent e) { }
+				public void mouseExited(MouseEvent e) { }
+				public void mousePressed(MouseEvent e) { }
+				public void mouseReleased(MouseEvent e) { }
+				
+			});
 		}
 		return resultsTable;
 	}
