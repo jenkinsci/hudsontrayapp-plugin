@@ -60,6 +60,7 @@ import org.hudson.trayapp.gui.tray.TrayIconImplementation;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.JCheckBox;
+import javax.swing.JTextArea;
 
 public class MainFrame extends JFrame implements HyperlinkListener{
 
@@ -238,6 +239,12 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 	private JCheckBox showAnimatedBuildCB = null;
 	private JLabel showPopupNotificationLabel = null;
 	private JCheckBox showPopupNotificationCB = null;
+	private JPanel aboutPanel = null;
+	private JLabel hudsonTrayAppLabel = null;
+	private JPanel versionInformationPanel = null;
+	private JLabel versionLabel = null;
+	private JPanel licenseInformationPanel = null;
+	private JTextArea licenseInformationTextArea = null;
 	/**
 	 * This is the default constructor
 	 */
@@ -255,7 +262,7 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 		this.setSize(580, 797);
 		this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/org/hudson/trayapp/gui/icons/16x16/hudson.png")));
 		this.setContentPane(getJContentPane());
-		this.setTitle("Hudson Tray Monitor");
+		this.setTitle("Hudson Tray Application");
 	}
 
 	/**
@@ -280,8 +287,10 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 	public JTabbedPane getMainTabbedPane() {
 		if (mainTabbedPane == null) {
 			mainTabbedPane = new JTabbedPane();
+			mainTabbedPane.setName("");
 			mainTabbedPane.addTab("Latest Results", null, getResultsPanel(), null);
 			mainTabbedPane.addTab("Configuration", null, getConfigurationPanel(), null);
+			mainTabbedPane.addTab("About", null, getAboutPanel(), null);
 		}
 		return mainTabbedPane;
 	}
@@ -1738,5 +1747,71 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 			});
 		}
 		return showPopupNotificationCB;
+	}
+
+	/**
+	 * This method initializes aboutPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getAboutPanel() {
+		if (aboutPanel == null) {
+			hudsonTrayAppLabel = new JLabel();
+			hudsonTrayAppLabel.setText("Hudson Tray Application");
+			hudsonTrayAppLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+			hudsonTrayAppLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			aboutPanel = new JPanel();
+			aboutPanel.setLayout(new BorderLayout());
+			aboutPanel.add(getVersionInformationPanel(), BorderLayout.NORTH);
+			aboutPanel.add(getLicenseInformationPanel(), BorderLayout.CENTER);
+		}
+		return aboutPanel;
+	}
+
+	/**
+	 * This method initializes versionInformationPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getVersionInformationPanel() {
+		if (versionInformationPanel == null) {
+			versionLabel = new JLabel();
+			versionLabel.setText("Version: 0.6.3");
+			versionLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+			versionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			versionInformationPanel = new JPanel();
+			versionInformationPanel.setLayout(new BorderLayout());
+			versionInformationPanel.add(hudsonTrayAppLabel, BorderLayout.CENTER);
+			versionInformationPanel.add(versionLabel, BorderLayout.SOUTH);
+		}
+		return versionInformationPanel;
+	}
+
+	/**
+	 * This method initializes licenseInformationPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getLicenseInformationPanel() {
+		if (licenseInformationPanel == null) {
+			licenseInformationPanel = new JPanel();
+			licenseInformationPanel.setLayout(new BorderLayout());
+			licenseInformationPanel.add(getLicenseInformationTextArea(), BorderLayout.CENTER);
+		}
+		return licenseInformationPanel;
+	}
+
+	/**
+	 * This method initializes licenseInformationTextArea	
+	 * 	
+	 * @return javax.swing.JTextArea	
+	 */
+	private JTextArea getLicenseInformationTextArea() {
+		if (licenseInformationTextArea == null) {
+			licenseInformationTextArea = new JTextArea();
+			licenseInformationTextArea.setEditable(false);
+			licenseInformationTextArea.setText("Hudson Tray Application\n\nAuthors:\nDavid Hayes\n\nLicense:\nGPLv3 (http://www.gnu.org/licenses/gpl.html) - Compatible with Hudson's MIT License\n\nContributory Code:\nBase64 - iHarder.net (Public Domain)\nTableSorter - Sun JDK 1.4.2_17 Demo (Public Domain)\njdic - jdic.dev.java.net (LGPL)");
+		}
+		return licenseInformationTextArea;
 	}
 }  //  @jve:decl-index=0:visual-constraint="0,-42"
