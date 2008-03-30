@@ -624,6 +624,9 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 					setIcon(icon);
 					icon.setImageObserver(new CellImageObserver(resultsTable, row, column));
 					setText("");
+					if (((Integer) value).intValue() != -1) {
+						setToolTipText(((Integer) value).toString() + "%");
+					}
 					setIgnoreRepaint(false);
 					return this;
 				}
