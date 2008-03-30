@@ -132,7 +132,8 @@ public class Job {
 	 * Note this method is far from complete. Right now it encapsulates " "'s with %20's and that's it.
 	 * @return
 	 */
-	public String getRFC2396CompliantURL() {
+	public String getRFC2396CompliantURL() { return getRFC2396CompliantURL(url); }
+	public static String getRFC2396CompliantURL(String url) {
 		return url.replaceAll(" ", "%20");
 	}
 
