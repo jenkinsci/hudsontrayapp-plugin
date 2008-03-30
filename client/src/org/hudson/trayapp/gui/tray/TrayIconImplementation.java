@@ -26,5 +26,5 @@ public abstract class TrayIconImplementation {
 	
 	public abstract void setIcon(ImageIcon icon);
 	
-	public abstract void browse(URI uri) throws Exception;
+	public abstract void browse(final URI uri) throws Exception;
 }

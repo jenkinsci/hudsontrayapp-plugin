@@ -10,6 +10,7 @@ import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.net.URI;
 
 import javax.swing.ImageIcon;
@@ -75,8 +76,16 @@ public class AWTTrayIcon extends TrayIconImplementation {
 		trayIcon.setToolTip(tooltip);
 	}
 	
-	public void browse(URI uri) throws Exception {
-		Desktop.getDesktop().browse(uri);
+	public void browse(final URI uri) throws Exception {
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					Desktop.getDesktop().browse(uri);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}, "browse launch thread " + uri.toString()).start();
 	}
 	
 	private class TrayIconMouseListenerWithJPopupMenu implements MouseListener{

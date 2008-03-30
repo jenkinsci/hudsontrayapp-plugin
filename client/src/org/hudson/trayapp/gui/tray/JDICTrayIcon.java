@@ -1,12 +1,15 @@
 package org.hudson.trayapp.gui.tray;
 
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
 import org.jdesktop.jdic.desktop.Desktop;
+import org.jdesktop.jdic.desktop.DesktopException;
 import org.jdesktop.jdic.tray.SystemTray;
 import org.jdesktop.jdic.tray.TrayIcon;
 
@@ -56,7 +59,17 @@ public class JDICTrayIcon extends TrayIconImplementation {
 	public void setToolTip(String tooltip) {
 		trayIcon.setToolTip(tooltip);
 	}
-	public void browse(URI uri) throws Exception {
-		Desktop.browse(uri.toURL());
+	public void browse(final URI uri) throws Exception {
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					Desktop.browse(uri.toURL());
+				} catch (DesktopException e) {
+					e.printStackTrace();
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
+			}
+		}, "browse launch thread " + uri.toString()).start();
 	}
 }
