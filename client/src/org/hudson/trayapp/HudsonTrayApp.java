@@ -27,7 +27,7 @@ import org.xml.sax.InputSource;
 
 public class HudsonTrayApp {
 	
-	public final static String VERSION = "0.6.4";
+	public final static String VERSION = "0.7.0";
 
 	public static void main(String[] args) {
 		HudsonTrayApp.args = args;
