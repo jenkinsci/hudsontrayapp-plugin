@@ -65,9 +65,9 @@ public class JDICTrayIcon extends TrayIconImplementation {
 				try {
 					Desktop.browse(uri.toURL());
 				} catch (DesktopException e) {
-					e.printStackTrace();
+					TrayIconImplementation.displayException("Browse Exception", "Couldn't launch " + uri.toString(), e);
 				} catch (MalformedURLException e) {
-					e.printStackTrace();
+					TrayIconImplementation.displayException("Browse Exception", "Couldn't launch " + uri.toString(), e);
 				}
 			}
 		}, "browse launch thread " + uri.toString()).start();

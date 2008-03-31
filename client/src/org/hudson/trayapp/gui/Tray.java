@@ -103,7 +103,7 @@ public class Tray {
 									} catch (InterruptedException e){}
 									trayIcon.browse(new URL(jobLink.getRFC2396CompliantURL()).toURI());
 								} catch (Exception e) {
-									showMessage("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl() + "\n" + e.getLocalizedMessage(), TrayIconImplementation.ERROR_MESSAGE_TYPE);
+									TrayIconImplementation.displayException("Could not launch web page", "Tried to launch:\n" + jobLink.getUrl(), e);
 								}
 							}
 						}, "URL Launching Thread").start();

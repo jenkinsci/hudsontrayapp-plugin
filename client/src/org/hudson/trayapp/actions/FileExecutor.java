@@ -22,13 +22,10 @@ public class FileExecutor implements Action {
 				Runtime.getRuntime().exec(fileToExecute);
 			} catch (Exception e) {
 				String buildChangedText = buildChanged.intValue() == Job.BUILD_CHANGED.intValue() ? "Build Changed" : "Build Unchanged";
-				HudsonTrayApp.getHudsonTrayAppInstance().getTray().showMessage("Error running file", "FileExecutor Action:\n"
+				TrayIconImplementation.displayException("Error running file",  "FileExecutor Action:\n"
 						+ Job.getColour(colourFrom) + "->" + Job.getColour(colourTo) + ":" + buildChangedText + "\n"
 						+ fileToExecute + "\n"
-						+ "Exception thrown when running this file:\n"
-						+ e.getLocalizedMessage(),
-						TrayIconImplementation.ERROR_MESSAGE_TYPE
-				);
+						+ "Exception thrown when running this file:", e);
 			}
 		}
 	}
@@ -63,7 +60,11 @@ public class FileExecutor implements Action {
 				process(node.getChildNodes());
 			} else if (name.equals("file")) {
 				try {
-					fileToExecute = new String(Base64.decode(value), "UTF-8");
+					if (value != null) {
+						fileToExecute = new String(Base64.decode(value), "UTF-8");
+					} else {
+						fileToExecute = "";
+					}
 				} catch (UnsupportedEncodingException e) {
 					System.err.println(e.getLocalizedMessage());
 				}

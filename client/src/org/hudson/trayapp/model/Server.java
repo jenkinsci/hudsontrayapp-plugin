@@ -6,10 +6,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.hudson.trayapp.gui.tray.TrayIconImplementation;
 import org.hudson.trayapp.util.XMLHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -41,7 +40,7 @@ public class Server {
 	public Server(String url, String name) {
 		defaults();
 		this.name = name;
-		this.url = url;
+		this.url = Job.getRFC2396CompliantURL(url);
 		if (url.length() > 0)
 			update();
 	}
@@ -94,11 +93,11 @@ public class Server {
 				}
 			}
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			TrayIconImplementation.displayException("Server Update Exception", "Updating Server " + name, e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			TrayIconImplementation.displayException("Server Update Exception", "Updating Server " + name, e);
 		} catch (SAXException e) {
-			e.printStackTrace();
+			TrayIconImplementation.displayException("Server Update Exception", "Updating Server " + name, e);
 		}
 
 		return updated;
@@ -133,7 +132,7 @@ public class Server {
 			} else if (name.equals("description")) {
 				description = value;
 			} else if (name.equals("url")) {
-				url = value;
+				url = Job.getRFC2396CompliantURL(value);
 			} else if (name.equals("job")) {
 				Job job = Job.process(node);
 				jobs.add(job);
@@ -303,7 +302,9 @@ public class Server {
 					 return bVersion173OrGreater;
 				 }
 			} catch (MalformedURLException e) {
+				TrayIconImplementation.displayException("Exception on Version Check", "Trying to get Hudson Version", e);
 			} catch (IOException e) {
+				TrayIconImplementation.displayException("Exception on Version Check", "Trying to get Hudson Version", e);
 			}
 			bVersion173OrGreater = false;
 			return false;
@@ -316,7 +317,7 @@ public class Server {
 	private static Pattern pattern = Pattern.compile("([0-9.]*).*");
 
 	public void setUrl(String url) {
-		this.url = url;
+		this.url = Job.getRFC2396CompliantURL(url);
 	}
 
 	public void setName(String name) {

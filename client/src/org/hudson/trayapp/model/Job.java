@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.hudson.trayapp.gui.tray.TrayIconImplementation;
 import org.hudson.trayapp.model.job.Build;
 import org.hudson.trayapp.model.job.HealthReport;
 import org.hudson.trayapp.util.XMLHelper;
@@ -112,11 +113,11 @@ public class Job {
 			process(document.getChildNodes());
 
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			TrayIconImplementation.displayException("Job Update Exception", "Updating Job " + name, e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			TrayIconImplementation.displayException("Job Update Exception", "Updating Job " + name, e);
 		} catch (SAXException e) {
-			e.printStackTrace();
+			TrayIconImplementation.displayException("Job Update Exception", "Updating Job " + name, e);
 		}
 	}
 
