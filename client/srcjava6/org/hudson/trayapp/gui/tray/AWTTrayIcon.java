@@ -1,13 +1,17 @@
 package org.hudson.trayapp.gui.tray;
 
+import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.EventQueue;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -68,6 +72,7 @@ public class AWTTrayIcon extends TrayIconImplementation {
 
 	@Override
 	public void setPopupMenu(JPopupMenu popupmenu) {
+		Toolkit.getDefaultToolkit().getSystemEventQueue().push( new PopupFixQueue(popupmenu) );
 		mouseListener.popupMenu = popupmenu;
 	}
 
@@ -88,28 +93,10 @@ public class AWTTrayIcon extends TrayIconImplementation {
 		}, "browse launch thread " + uri.toString()).start();
 	}
 	
-	private class TrayIconMouseListenerWithJPopupMenu implements MouseListener{
+	private class TrayIconMouseListenerWithJPopupMenu extends MouseAdapter{
 		
 		private JPopupMenu popupMenu = null;
-
-		@Override
-		public void mouseClicked(MouseEvent e) { }
-
-		@Override
-		public void mouseEntered(MouseEvent e) { }
-
-		@Override
-		public void mouseExited(MouseEvent e) { }
-
-		@Override
-		public void mousePressed(MouseEvent e) {
-			if (e.isPopupTrigger() && popupMenu != null) {
-				popupMenu.setLocation(e.getX(), e.getY());
-				popupMenu.setInvoker(popupMenu);
-				popupMenu.setVisible(true);
-			}
-		}
-
+		
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			if (e.isPopupTrigger() && popupMenu != null) {
@@ -118,5 +105,24 @@ public class AWTTrayIcon extends TrayIconImplementation {
 				popupMenu.setVisible(true);
 			}
 		}
+	}
+	
+	private class PopupFixQueue extends EventQueue {
+
+	    private JPopupMenu popup;
+
+	    public PopupFixQueue(JPopupMenu popup) {
+	        this.popup = popup;
+	    }
+
+	    protected void dispatchEvent(AWTEvent event) {
+	        try {
+	            super.dispatchEvent(event);
+	        } catch (Exception ex) {
+	            if (event.getSource() instanceof TrayIcon) {
+	                popup.setVisible(false);
+	            }
+	        }
+	    }
 	}
 }
