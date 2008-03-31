@@ -26,6 +26,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 public class HudsonTrayApp {
+	
+	public final static String VERSION = "0.6.4";
 
 	public static void main(String[] args) {
 		HudsonTrayApp.args = args;
@@ -182,7 +184,7 @@ public class HudsonTrayApp {
 			writeXML(w);
 			w.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			TrayIconImplementation.displayException("File Write Exception", "Excpetion saving Preferences file", e);
 		}
 	}
 	
