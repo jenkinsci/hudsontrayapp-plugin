@@ -20,21 +20,20 @@ import java.net.URI;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
+import org.jdesktop.swinghelper.tray.JXTrayIcon;
+
 public class AWTTrayIcon extends TrayIconImplementation {
 
-	private TrayIcon trayIcon;
-	private TrayIconMouseListenerWithJPopupMenu mouseListener;
+	private JXTrayIcon trayIcon;
 	
 	public AWTTrayIcon(ImageIcon icon) {
 		super(icon);
-		trayIcon = new TrayIcon(icon.getImage());
+		trayIcon = new JXTrayIcon(icon.getImage());
 		try {
 			SystemTray.getSystemTray().add(trayIcon);
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
-		mouseListener = new TrayIconMouseListenerWithJPopupMenu();
-		trayIcon.addMouseListener(mouseListener);
 		System.out.println("AWTTrayIcon");
 	}
 	
@@ -72,8 +71,7 @@ public class AWTTrayIcon extends TrayIconImplementation {
 
 	@Override
 	public void setPopupMenu(JPopupMenu popupmenu) {
-		Toolkit.getDefaultToolkit().getSystemEventQueue().push( new PopupFixQueue(popupmenu) );
-		mouseListener.popupMenu = popupmenu;
+		trayIcon.setJPopuMenu(popupmenu);
 	}
 
 	@Override
@@ -91,38 +89,5 @@ public class AWTTrayIcon extends TrayIconImplementation {
 				}
 			}
 		}, "browse launch thread " + uri.toString()).start();
-	}
-	
-	private class TrayIconMouseListenerWithJPopupMenu extends MouseAdapter{
-		
-		private JPopupMenu popupMenu = null;
-		
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			if (e.isPopupTrigger() && popupMenu != null) {
-				popupMenu.setLocation(e.getX(), e.getY());
-				popupMenu.setInvoker(popupMenu);
-				popupMenu.setVisible(true);
-			}
-		}
-	}
-	
-	private class PopupFixQueue extends EventQueue {
-
-	    private JPopupMenu popup;
-
-	    public PopupFixQueue(JPopupMenu popup) {
-	        this.popup = popup;
-	    }
-
-	    protected void dispatchEvent(AWTEvent event) {
-	        try {
-	            super.dispatchEvent(event);
-	        } catch (Exception ex) {
-	            if (event.getSource() instanceof TrayIcon) {
-	                popup.setVisible(false);
-	            }
-	        }
-	    }
 	}
 }
