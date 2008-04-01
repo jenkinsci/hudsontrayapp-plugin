@@ -6,6 +6,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -19,6 +20,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -99,6 +102,17 @@ public class MainFrame extends JFrame implements HyperlinkListener{
 		this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/org/hudson/trayapp/gui/icons/16x16/hudson.png")));
 		this.setContentPane(getJContentPane());
 		this.setTitle("Hudson Tray Application");
+		
+		addWindowStateListener(new WindowStateListener() {
+
+			public void windowStateChanged(WindowEvent e) {
+				if (e.getID() == WindowEvent.WINDOW_STATE_CHANGED && e.getNewState() == Frame.ICONIFIED) {
+					setVisible(false);
+					setState(Frame.NORMAL);
+					dispose();
+				}
+			}	
+		});
 	}
 
 	/**
