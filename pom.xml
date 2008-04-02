@@ -33,6 +33,33 @@
     <finalName>${project.artifactId}</finalName>
     <defaultGoal>package</defaultGoal>
     <plugins>
+      
+       <plugin>
+		<artifactId>maven-antrun-plugin</artifactId>
+		<executions>
+				<execution>
+					<phase>compile</phase>
+					<id>compile</id>
+					<configuration>
+						<tasks>
+							<ant target="clientcomplete" dir="${basedir}" antfile="build.xml"/>
+						</tasks>
+					</configuration>
+					<goals>
+					<goal>run</goal>
+					</goals>
+				</execution>
+		</executions>
+        <dependencies>
+			<dependency>
+				<groupId>sun.jdk</groupId>
+				<artifactId>tools</artifactId>
+				<version>1.4.2</version>
+				<scope>system</scope>
+				<systemPath>${java.home}/../lib/tools.jar</systemPath>
+			</dependency>
+		</dependencies>
+      </plugin>
       <plugin>
         <groupId>org.jvnet.hudson.tools</groupId>
         <artifactId>maven-hpi-plugin</artifactId>
