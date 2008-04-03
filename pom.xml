@@ -9,7 +9,7 @@
   
   <artifactId>hudsontrayapp</artifactId>
   <packaging>hpi</packaging>
-  <version>0.7.2-SNAPSHOT</version>
+  <version>0.7.3-SNAPSHOT</version>
   
   <build>
     <defaultGoal>package</defaultGoal>
