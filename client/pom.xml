@@ -1,0 +1,79 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.jvnet.hudson.plugins</groupId>
+        <artifactId>hudsontrayapp-pom</artifactId>
+        <version>0.7.3-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <groupId>org.jvnet.hudson.plugins.hudsontrayapp</groupId>
+    <artifactId>client</artifactId>
+    <packaging>jar</packaging>
+    <name>Hudson Tray Application Client App</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jvnet.hudson.plugins.hudsontrayapp</groupId>
+            <artifactId>client-common</artifactId>
+            <version>${pom.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.hudson.plugins.hudsontrayapp</groupId>
+            <artifactId>client-jdk16</artifactId>
+            <version>${pom.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <includeGroupIds>org.jvnet.hudson.plugins.hudsontrayapp</includeGroupIds>
+                            <includeScope>provided</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <keystore>${project.basedir}/.trayappkeystore</keystore>
+                            <keypass>hudsontrayappkeypass</keypass>
+                            <storepass>hudsontrayappstorepass</storepass>
+                            <alias>HudsonTrayApp</alias>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.hudson.trayapp.HudsonTrayApp</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

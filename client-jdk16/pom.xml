@@ -1,0 +1,35 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>hudsontrayapp-pom</artifactId>
+      <version>0.7.3-SNAPSHOT</version>
+      <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <groupId>org.jvnet.hudson.plugins.hudsontrayapp</groupId>
+  <artifactId>client-jdk16</artifactId>
+  <packaging>jar</packaging>
+  <name>Hudson Tray Application JDK1.6 Client Classes</name>
+
+  <build>
+      <plugins>
+        <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+            </configuration>
+        </plugin>
+      </plugins>
+  </build>
+
+  <dependencies>
+      <dependency>
+          <groupId>org.jvnet.hudson.plugins.hudsontrayapp</groupId>
+          <artifactId>client-common</artifactId>
+          <version>${pom.version}</version>
+      </dependency>
+  </dependencies>
+
+</project>

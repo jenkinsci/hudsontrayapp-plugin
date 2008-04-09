@@ -1,0 +1,36 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>hudsontrayapp-pom</artifactId>
+      <version>0.7.3-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.jvnet.hudson.plugins.hudsontrayapp</groupId>
+  <artifactId>client-common</artifactId>
+  <packaging>jar</packaging>
+  <name>Hudson Tray Application Common Client Classes</name>
+
+  <build>
+      <plugins>
+        <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.4</source>
+                <target>1.4</target>
+            </configuration>
+        </plugin>
+      </plugins>
+  </build>
+
+  <dependencies>
+      <dependency>
+          <groupId>net.java.dev.jdic</groupId>
+          <artifactId>jdic</artifactId>
+          <version>0.9.1</version>
+          <scope>system</scope>
+          <systemPath>${project.basedir}/../jdic-0.9.1-bin-cross-platform/jdic.jar</systemPath>
+      </dependency>
+  </dependencies>
+
+</project>
