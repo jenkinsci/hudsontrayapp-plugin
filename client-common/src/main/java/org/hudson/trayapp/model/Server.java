@@ -293,7 +293,7 @@ public class Server {
 				 Matcher matcher = null;
 				 if (version != null)
 					 matcher = pattern.matcher(version);
-				 if (matcher != null && matcher.matches() && matcher.groupCount() >= 1) {
+				 if (matcher != null && matcher.matches()) {
 					 float f = Float.parseFloat(matcher.group(1));
 					 bVersion173OrGreater = f > 1.172;
 					 return bVersion173OrGreater;
