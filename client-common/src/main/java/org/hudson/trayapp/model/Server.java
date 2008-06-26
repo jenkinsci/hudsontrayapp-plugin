@@ -289,11 +289,14 @@ public class Server {
 			try {
 				 urlo = new URL(getRootHudsonURL(url));
 				 URLConnection conn = urlo.openConnection();
-				 String version = conn.getHeaderField("X-Hudson") + " ";
-				 Matcher matcher = null;
-				 if (version != null)
-					 matcher = pattern.matcher(version);
-				 if (matcher != null && matcher.matches()) {
+				 String version = conn.getHeaderField("X-Hudson");
+				 if (version == null) {
+                                    TrayIconImplementation.displayException("Exception on Version Check", "No X-Hudson header. Is "+url+" really Hudson?", new Exception());
+                                     bVersion173OrGreater = false;
+                                     return false;
+                                 }
+                                 Matcher matcher = pattern.matcher(version);
+				 if (matcher.matches()) {
 					 float f = Float.parseFloat(matcher.group(1));
 					 bVersion173OrGreater = f > 1.172;
 					 return bVersion173OrGreater;
