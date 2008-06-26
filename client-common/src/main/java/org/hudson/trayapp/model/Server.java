@@ -314,7 +314,7 @@ public class Server {
 		}
 	}
 
-	private static Pattern pattern = Pattern.compile("([0-9.]*).*");
+	private static Pattern pattern = Pattern.compile("([0-9.]+).*");
 
 	public void setUrl(String url) {
 		this.url = Job.getRFC2396CompliantURL(url);
