@@ -39,7 +39,7 @@
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <stripVersion>true</stripVersion>
                             <includeGroupIds>org.jvnet.hudson.plugins.hudsontrayapp</includeGroupIds>
-                            <includeAtrifactIds>client</includeAtrifactIds>
+                            <includeArtifactIds>client</includeArtifactIds>
                             <includeScope>provided</includeScope>
                         </configuration>
                     </execution>
@@ -50,7 +50,7 @@
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
-                        <phase>package</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
@@ -100,7 +100,7 @@
                 <executions>
                     <execution>
                         <id>sign-jar1</id>
-                        <phase>process-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
@@ -114,7 +114,7 @@
                     </execution>
                     <execution>
                         <id>sign-jar2</id>
-                        <phase>process-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
@@ -128,7 +128,7 @@
                     </execution>
                     <execution>
                         <id>sign-jar3</id>
-                        <phase>process-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
@@ -142,7 +142,7 @@
                     </execution>
                     <execution>
                         <id>sign-jar4</id>
-                        <phase>process-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
@@ -156,7 +156,7 @@
                     </execution>
                     <execution>
                         <id>sign-jar5</id>
-                        <phase>process-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
@@ -170,7 +170,7 @@
                     </execution>
                     <execution>
                         <id>sign-jar6</id>
-                        <phase>process-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
@@ -184,7 +184,7 @@
                     </execution>
                     <execution>
                         <id>sign-jar7</id>
-                        <phase>process-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
@@ -198,7 +198,7 @@
                     </execution>
                     <execution>
                         <id>sign-jar8</id>
-                        <phase>process-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
