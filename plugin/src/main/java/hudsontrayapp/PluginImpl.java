@@ -20,9 +20,6 @@ import hudson.model.Hudson;
  * @plugin hudsontrayapp
  */
 public class PluginImpl extends Plugin {
-    public void start() throws Exception {
-    	Hudson.getInstance().getActions().add(new TrayAppAction());
-    }
 
 	public void doLaunch(StaplerRequest req, StaplerResponse res) throws IOException {
 		res.setHeader("Content-Disposition", "filename=launch.jnlp");

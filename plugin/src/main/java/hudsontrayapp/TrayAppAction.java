@@ -1,8 +1,10 @@
 package hudsontrayapp;
 
-import hudson.model.Action;
+import hudson.Extension;
+import hudson.model.RootAction;
 
-public class TrayAppAction implements Action{
+@Extension
+public class TrayAppAction implements RootAction {
 	
 	/**
 	 * 
