@@ -3,7 +3,7 @@
   <parent>
       <groupId>org.jvnet.hudson.plugins</groupId>
       <artifactId>hudsontrayapp-pom</artifactId>
-      <version>0.7.3</version>
+      <version>0.7.4-SNAPSHOT</version>
   </parent>
 
   <groupId>org.jvnet.hudson.plugins.hudsontrayapp</groupId>
