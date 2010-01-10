@@ -1,16 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project>
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jvnet.hudson.plugins</groupId>
         <artifactId>hudsontrayapp-pom</artifactId>
-        <version>0.7.4-SNAPSHOT</version>
+        <version>0.7.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>org.jvnet.hudson.plugins.hudsontrayapp</groupId>
     <artifactId>hudsontrayapp</artifactId>
     <packaging>hpi</packaging>
-    <version>0.7.4-SNAPSHOT</version>
+    <version>0.7.3-SNAPSHOT</version>
     <name>Hudson Tray Application Plugin</name>
     <url>http://wiki.hudson-ci.org/display/HUDSON/Hudson+Tray+Application</url>
     <developers>
@@ -63,7 +63,9 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <move file="${project.basedir}/src/main/webapp/client.jar" tofile="${project.basedir}/src/main/webapp/HudsonTrayApp.jar" overwrite="true" />
+                                <move file="${project.basedir}/src/main/webapp/client.jar"
+                                      tofile="${project.basedir}/src/main/webapp/HudsonTrayApp.jar"
+                                      overwrite="true" />
                                 <mkdir dir="${project.basedir}/src/main/webapp/win" />
                                 <mkdir dir="${project.basedir}/src/main/webapp/win/x86" />
                                 <mkdir dir="${project.basedir}/src/main/webapp/lin" />
@@ -71,10 +73,10 @@
                                 <mkdir dir="${project.basedir}/src/main/webapp/sun" />
                                 <mkdir dir="${project.basedir}/src/main/webapp/sun/x86" />
                                 <mkdir dir="${project.basedir}/src/main/webapp/sun/sparc" />
-                                <jar destfile="${project.basedir}/src/main/webapp/win/x86/jdic-native.jar" basedir="${project.basedir}/../jdic-0.9.1-bin-cross-platform/windows/x86" />
-                                <jar destfile="${project.basedir}/src/main/webapp/lin/x86/jdic-native.jar" basedir="${project.basedir}/../jdic-0.9.1-bin-cross-platform/linux/x86" />
-                                <jar destfile="${project.basedir}/src/main/webapp/sun/x86/jdic-native.jar" basedir="${project.basedir}/../jdic-0.9.1-bin-cross-platform/sunos/x86" />
-                                <jar destfile="${project.basedir}/src/main/webapp/sun/sparc/jdic-native.jar" basedir="${project.basedir}/../jdic-0.9.1-bin-cross-platform/sunos/sparc" />
+                                <jar destfile="${project.basedir}/src/main/webapp/win/x86/jdic-native.jar" basedir="${project.basedir}/../jdic-0.9.1-bin-cross-platform/windows/x86"/>
+                                <jar destfile="${project.basedir}/src/main/webapp/lin/x86/jdic-native.jar" basedir="${project.basedir}/../jdic-0.9.1-bin-cross-platform/linux/x86"/>
+                                <jar destfile="${project.basedir}/src/main/webapp/sun/x86/jdic-native.jar" basedir="${project.basedir}/../jdic-0.9.1-bin-cross-platform/sunos/x86"/>
+                                <jar destfile="${project.basedir}/src/main/webapp/sun/sparc/jdic-native.jar" basedir="${project.basedir}/../jdic-0.9.1-bin-cross-platform/sunos/sparc"/>
                                 <copy file="${project.basedir}/../jdic-0.9.1-bin-cross-platform/jdic.jar" todir="${project.basedir}/src/main/webapp/" />
                                 <copy file="${project.basedir}/../jdic-0.9.1-bin-cross-platform/windows/jdic_stub.jar" todir="${project.basedir}/src/main/webapp/win" />
                                 <copy file="${project.basedir}/../jdic-0.9.1-bin-cross-platform/linux/jdic_stub.jar" todir="${project.basedir}/src/main/webapp/lin" />
@@ -90,11 +92,11 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <delete file="${project.basedir}/src/main/webapp/HudsonTrayApp.jar" failonerror="false" />
-                                <delete file="${project.basedir}/src/main/webapp/jdic.jar" failonerror="false" />
-                                <delete dir="${project.basedir}/src/main/webapp/win" failonerror="false" />
-                                <delete dir="${project.basedir}/src/main/webapp/lin" failonerror="false" />
-                                <delete dir="${project.basedir}/src/main/webapp/sun" failonerror="false" />
+                                <delete file="${project.basedir}/src/main/webapp/HudsonTrayApp.jar" failonerror="false"/>
+                                <delete file="${project.basedir}/src/main/webapp/jdic.jar" failonerror="false"/>
+                                <delete dir="${project.basedir}/src/main/webapp/win" failonerror="false"/>
+                                <delete dir="${project.basedir}/src/main/webapp/lin" failonerror="false"/>
+                                <delete dir="${project.basedir}/src/main/webapp/sun" failonerror="false"/>
                             </tasks>
                         </configuration>
                     </execution>
