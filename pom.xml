@@ -19,4 +19,9 @@
     <module>client</module>
   </modules>
 
+  <scm>
+    <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/trunk/hudson/plugins/hudsontrayapp</connection>
+    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/hudsontrayapp</developerConnection>
+    <url>https://hudson.dev.java.net/source/browse/hudson/hudson/plugins/hudsontrayapp</url>
+  </scm>
 </project>
