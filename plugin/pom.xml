@@ -3,14 +3,14 @@
     <parent>
         <groupId>org.jvnet.hudson.plugins</groupId>
         <artifactId>hudsontrayapp-pom</artifactId>
-        <version>0.7.3</version>
+        <version>0.7.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>org.jvnet.hudson.plugins.hudsontrayapp</groupId>
     <artifactId>hudsontrayapp</artifactId>
     <packaging>hpi</packaging>
-    <version>0.7.3</version>
+    <version>0.7.4-SNAPSHOT</version>
     <name>Hudson Tray Application Plugin</name>
     <url>http://wiki.hudson-ci.org/display/HUDSON/Hudson+Tray+Application</url>
     <developers>
