@@ -12,6 +12,13 @@
     <packaging>hpi</packaging>
     <version>0.7.3-SNAPSHOT</version>
     <name>Hudson Tray Application Plugin</name>
+    <url>http://wiki.hudson-ci.org/display/HUDSON/Hudson+Tray+Application</url>
+    <developers>
+        <developer>
+            <id>davyboyhayes</id>
+            <name>David Hayes</name>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
