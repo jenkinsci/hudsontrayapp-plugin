@@ -184,7 +184,7 @@ public class HudsonTrayApp {
 			writeXML(w);
 			w.close();
 		} catch (Exception e) {
-			TrayIconImplementation.displayException("File Write Exception", "Excpetion saving Preferences file", e);
+			TrayIconImplementation.displayException("File Write Exception", "Exception saving Preferences file", e);
 		}
 	}
 	

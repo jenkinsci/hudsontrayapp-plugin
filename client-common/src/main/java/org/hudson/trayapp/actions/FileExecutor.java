@@ -71,4 +71,8 @@ public class FileExecutor implements Action {
 			}
 		}
 	}
+
+    public int hashCode() {
+        return fileToExecute.hashCode();
+    }
 }
