@@ -309,3 +309,17 @@ plugin/target/classes/hudsontrayapp/PluginImpl.class
 plugin/target/classes/hudsontrayapp/TrayAppAction.class
 plugin/target/classes/index.jelly
 .DS_Store
+client-common/target/client-common.jar
+client-common/target/maven-archiver/pom.properties
+client-jdk16/target/client-jdk16.jar
+client-jdk16/target/maven-archiver/pom.properties
+client/target/classes/META-INF/MANIFEST.MF
+client/target/classes/META-INF/maven/org.jvnet.hudson.plugins.hudsontrayapp/client-common/pom.properties
+client/target/classes/META-INF/maven/org.jvnet.hudson.plugins.hudsontrayapp/client-common/pom.xml
+client/target/classes/META-INF/maven/org.jvnet.hudson.plugins.hudsontrayapp/client-jdk16/pom.properties
+client/target/classes/META-INF/maven/org.jvnet.hudson.plugins.hudsontrayapp/client-jdk16/pom.xml
+*.class
+client/target/classes
+client/target
+plugin/src/main/webapp
+plugin/target

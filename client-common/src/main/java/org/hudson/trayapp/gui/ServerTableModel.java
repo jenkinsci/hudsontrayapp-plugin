@@ -25,7 +25,7 @@ public class ServerTableModel extends AbstractTableModel {
 	 * @return
 	 */
 	public int getColumnCount() {
-		return server.isHealthSupported() ? 4 : 3;
+		return 4;
 	}
 
 	/**
@@ -60,17 +60,11 @@ public class ServerTableModel extends AbstractTableModel {
 		case 0:
 			return job.getColour();
 		case 1:
-			if (server.isHealthSupported()) {
-				return new Integer(job.getWorstHealthScore());
-			} else {
-				return job.getName();
-			}
+			return new Integer(job.getWorstHealthScore());
+
 		case 2:
-			if (server.isHealthSupported()) {
-				return job.getName();
-			} else {
-				return job.getUrl();
-			}
+			return job.getName();
+
 		case 3:
 			return job.getUrl();
 		default:
@@ -83,11 +77,7 @@ public class ServerTableModel extends AbstractTableModel {
 		case 0:
 			return String.class;
 		case 1:
-			if (server.isHealthSupported()) {
-				return Integer.class;
-			} else {
-				return String.class;
-			}
+			return Integer.class;
 		case 2:
 			return String.class;
 		default:
@@ -103,17 +93,9 @@ public class ServerTableModel extends AbstractTableModel {
 		case 0:
 			return "";
 		case 1:
-			if (server.isHealthSupported()) {
-				return "";
-			} else {
-				return "Name";
-			}
+			return "";
 		case 2:
-			if (server.isHealthSupported()) {
-				return "Name";
-			} else {
-				return "URL";
-			}
+			return "Name";
 		default:
 			return null;
 		}
